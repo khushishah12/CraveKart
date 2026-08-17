@@ -156,20 +156,20 @@ on conflict (id) do nothing;
 
 insert into public.menu_items (id, restaurant_id, name, description, price, category, image_url) values
 -- Pizza Palace
-('00000000-0000-4000-a000-000000000001', '00000000-0000-4000-9000-000000000001', 'Margherita Pizza',   'Fresh basil, mozzarella, rich tomato sauce.',  9.99,  'Pizza', '🍕'),
-('00000000-0000-4000-a000-000000000002', '00000000-0000-4000-9000-000000000001', 'Pepperoni Feast',    'Double pepperoni with extra cheese.',           12.49, 'Pizza', '🍕'),
-('00000000-0000-4000-a000-000000000003', '00000000-0000-4000-9000-000000000001', 'Garlic Breadsticks', 'Buttery garlic bread with marinara dip.',        5.99,  'Sides', '🥖'),
-('00000000-0000-4000-a000-000000000004', '00000000-0000-4000-9000-000000000001', 'Tiramisu',           'Classic Italian coffee-soaked dessert.',        6.49,  'Dessert', '🍰'),
+('00000000-0000-4000-a000-000000000001', '00000000-0000-4000-9000-000000000001', 'Margherita Pizza',   'Fresh basil, mozzarella, rich tomato sauce.',  189,  'Pizza', '🍕'),
+('00000000-0000-4000-a000-000000000002', '00000000-0000-4000-9000-000000000001', 'Pepperoni Feast',    'Double pepperoni with extra cheese.',           329, 'Pizza', '🍕'),
+('00000000-0000-4000-a000-000000000003', '00000000-0000-4000-9000-000000000001', 'Garlic Breadsticks', 'Buttery garlic bread with marinara dip.',        129,  'Sides', '🥖'),
+('00000000-0000-4000-a000-000000000004', '00000000-0000-4000-9000-000000000001', 'Tiramisu',           'Classic Italian coffee-soaked dessert.',        149,  'Dessert', '🍰'),
 -- Burger Barn
-('00000000-0000-4000-a000-000000000005', '00000000-0000-4000-9000-000000000002', 'Classic Cheeseburger','Smash patty, cheddar, pickles, secret sauce.',  8.99,  'Burgers', '🍔'),
-('00000000-0000-4000-a000-000000000006', '00000000-0000-4000-9000-000000000002', 'Bacon BBQ Burger',   'Crispy bacon, onion rings, smoky BBQ.',         10.99, 'Burgers', '🍔'),
-('00000000-0000-4000-a000-000000000007', '00000000-0000-4000-9000-000000000002', 'Crispy Fries',       'Golden fries with a chipotle dip.',             3.99,  'Sides', '🍟'),
-('00000000-0000-4000-a000-000000000008', '00000000-0000-4000-9000-000000000002', 'Chocolate Shake',    'Thick and creamy, topped with whipped cream.',  5.49,  'Drinks', '🥤'),
+('00000000-0000-4000-a000-000000000005', '00000000-0000-4000-9000-000000000002', 'Classic Cheeseburger','Smash patty, cheddar, pickles, secret sauce.',  139,  'Burgers', '🍔'),
+('00000000-0000-4000-a000-000000000006', '00000000-0000-4000-9000-000000000002', 'Bacon BBQ Burger',   'Crispy bacon, onion rings, smoky BBQ.',         179, 'Burgers', '🍔'),
+('00000000-0000-4000-a000-000000000007', '00000000-0000-4000-9000-000000000002', 'Crispy Fries',       'Golden fries with a chipotle dip.',             89,  'Sides', '🍟'),
+('00000000-0000-4000-a000-000000000008', '00000000-0000-4000-9000-000000000002', 'Chocolate Shake',    'Thick and creamy, topped with whipped cream.',  119,  'Drinks', '🥤'),
 -- Spice Route
-('00000000-0000-4000-a000-000000000009', '00000000-0000-4000-9000-000000000003', 'Butter Chicken',     'Creamy tomato gravy with tandoori chicken.',    11.99, 'Curries', '🍛'),
-('00000000-0000-4000-a000-000000000010', '00000000-0000-4000-9000-000000000003', 'Paneer Tikka',       'Smoky grilled paneer with mint chutney.',       9.49,  'Starters', '🧆'),
-('00000000-0000-4000-a000-000000000011', '00000000-0000-4000-9000-000000000003', 'Garlic Naan',        'Soft, pillowy naan brushed with garlic butter.', 2.99,  'Breads', '🫓'),
-('00000000-0000-4000-a000-000000000012', '00000000-0000-4000-9000-000000000003', 'Gulab Jamun',        'Warm milk dumplings in rose syrup.',            4.49,  'Dessert', '🍮')
+('00000000-0000-4000-a000-000000000009', '00000000-0000-4000-9000-000000000003', 'Butter Chicken',     'Creamy tomato gravy with tandoori chicken.',    399, 'Curries', '🍛'),
+('00000000-0000-4000-a000-000000000010', '00000000-0000-4000-9000-000000000003', 'Paneer Tikka',       'Smoky grilled paneer with mint chutney.',       329,  'Starters', '🧆'),
+('00000000-0000-4000-a000-000000000011', '00000000-0000-4000-9000-000000000003', 'Garlic Naan',        'Soft, pillowy naan brushed with garlic butter.', 50,  'Breads', '🫓'),
+('00000000-0000-4000-a000-000000000012', '00000000-0000-4000-9000-000000000003', 'Gulab Jamun',        'Warm milk dumplings in rose syrup.',            89,  'Dessert', '🍮')
 on conflict (id) do nothing;
 
 -- ------------------------------------------------------------
@@ -186,14 +186,14 @@ on conflict (code) do nothing;
 -- ------------------------------------------------------------
 insert into public.orders (user_id, restaurant_name, items, total, status, cc_number, delivery_address) values
 ('00000000-0000-4000-8000-000000000002', 'Pizza Palace',
- '[{"name":"Margherita Pizza","price":9.99,"qty":2},{"name":"Garlic Breadsticks","price":5.99,"qty":1}]',
- 25.97, 'delivered', '4111111111111111', '221B Baker Street, Apt 4, Mumbai 400001'),
+ '[{"name":"Margherita Pizza","price":189,"qty":2},{"name":"Garlic Breadsticks","price":129,"qty":1}]',
+ 507, 'delivered', '4111111111111111', '221B Baker Street, Apt 4, Mumbai 400001'),
 ('00000000-0000-4000-8000-000000000002', 'Burger Barn',
- '[{"name":"Bacon BBQ Burger","price":10.99,"qty":1}]',
- 10.99, 'on_the_way', '5500000000000004', '221B Baker Street, Apt 4, Mumbai 400001'),
+ '[{"name":"Bacon BBQ Burger","price":179,"qty":1}]',
+ 179, 'on_the_way', '5500000000000004', '221B Baker Street, Apt 4, Mumbai 400001'),
 ('00000000-0000-4000-8000-000000000003', 'Spice Route',
- '[{"name":"Butter Chicken","price":11.99,"qty":1},{"name":"Garlic Naan","price":2.99,"qty":2}]',
- 17.97, 'pending', '4111111111111111', 'C-42, Green Park, Delhi 110016')
+ '[{"name":"Butter Chicken","price":399,"qty":1},{"name":"Garlic Naan","price":50,"qty":2}]',
+ 499, 'pending', '4111111111111111', 'C-42, Green Park, Delhi 110016')
 on conflict (id) do nothing;
 
 -- ------------------------------------------------------------
@@ -220,6 +220,6 @@ union all select 'payments', count(*) from public.payments;
 -- SAMPLE PAYMENTS  (mirror the sample orders; run-once setup)
 -- ------------------------------------------------------------
 insert into public.payments (order_id, amount, card_brand, card_last4, cc_number, status) values
-(1001, 25.97, 'Visa',       '1111', '4111111111111111', 'succeeded'),
-(1002, 10.99, 'Mastercard', '0004', '5500000000000004', 'succeeded'),
-(1003, 17.97, 'Visa',       '1111', '4111111111111111', 'pending');
+(1001, 507, 'Visa',       '1111', '4111111111111111', 'succeeded'),
+(1002, 179, 'Mastercard', '0004', '5500000000000004', 'succeeded'),
+(1003, 499, 'Visa',       '1111', '4111111111111111', 'pending');
