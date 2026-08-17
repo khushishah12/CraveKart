@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import {
   ArrowRight,
   Bike,
@@ -13,6 +14,18 @@ import {
 
 import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/Button";
+import { useIsAdmin, useIsRestaurantOwner } from "@/lib/auth";
+
+const UserMenu = dynamic(
+  () => import("@/components/ui/UserMenu").then((m) => m.UserMenu),
+  { ssr: false }
+);
+
+const AdminNav = dynamic(
+  () => import("@/components/ui/AdminNav").then((m) => m.AdminNav),
+  { ssr: false }
+);
+
 const trust = [
   { icon: Timer, label: "30-min delivery" },
   { icon: ShieldCheck, label: "Secure checkout" },
@@ -31,7 +44,6 @@ export default function HomePage() {
       <div className="animate-blob absolute -right-24 top-1/3 size-80 rounded-full bg-coral-400/20 blur-3xl [animation-delay:-7s]" />
       <div className="absolute bottom-0 left-1/2 h-64 w-[70rem] max-w-full -translate-x-1/2 rounded-full bg-white/40 blur-3xl" />
 
-<<<<<<< HEAD
       <header className="relative z-10 mx-auto w-full max-w-6xl px-4 py-5 sm:px-6">
         <div className="flex items-center gap-4">
           <Logo size="lg" />
@@ -39,34 +51,13 @@ export default function HomePage() {
             <div className="flex min-w-0 flex-1 justify-center overflow-x-auto">
               <AdminNav />
             </div>
-=======
-      <header className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
-        <Logo size="lg" />
-        <nav className="flex items-center gap-2.5">
-          {isAdmin ? (
-            <Link href="/admin">
-              <Button size="sm">Dashboard</Button>
-            </Link>
-          ) : isOwner ? (
-            <Link href="/owner">
-              <Button size="sm">Restaurant Dashboard</Button>
-            </Link>
-          ) : (
-            <>
-              <Link
-                href="/login"
-                className="focus-ring rounded-full px-4 py-2 text-sm font-semibold text-ink-700 transition-colors hover:text-primary-600"
-              >
-                Sign in
-              </Link>
-              <Link href="/register">
-                <Button size="sm">Get started</Button>
-              </Link>
-            </>
->>>>>>> 86e8a7d (feat:add restaurant owner role)
           )}
           <nav className="ml-auto flex shrink-0 items-center gap-2.5">
-            {isAdmin ? null : (
+            {isAdmin ? null : isOwner ? (
+              <Link href="/owner">
+                <Button size="sm">Restaurant Dashboard</Button>
+              </Link>
+            ) : (
               <>
                 <Link
                   href="/login"
@@ -79,6 +70,7 @@ export default function HomePage() {
                 </Link>
               </>
             )}
+            <UserMenu />
           </nav>
         </div>
       </header>
@@ -169,7 +161,6 @@ export default function HomePage() {
           </>
         ) : (
           <>
-
             <span className="glass inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[13px] font-semibold text-ink-700">
               <Flame className="size-3.5 text-primary-600" />
               Hot food, delivered in 30 minutes
