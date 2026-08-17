@@ -21,7 +21,6 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { StatCard } from "@/components/ui/StatCard";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Badge, statusTone, STATUS_LABEL } from "@/components/ui/Badge";
-import { OwnerNav } from "@/components/ui/OwnerNav";
 import { useCurrentUser, useIsRestaurantOwner } from "@/lib/auth";
 
 const UserMenu = dynamic(
@@ -84,6 +83,7 @@ export default function OwnerDashboardPage() {
       backHref="/"
       backLabel="Go home"
       maxWidth="max-w-6xl"
+      roleNav
       right={<UserMenu />}
     >
       {!isOwner ? (
@@ -119,7 +119,6 @@ export default function OwnerDashboardPage() {
               </>
             }
           />
-          <OwnerNav />
 
           {loading ? (
             <div className="mt-8">

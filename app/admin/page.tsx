@@ -22,7 +22,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { StatCard } from "@/components/ui/StatCard";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Badge, statusTone, STATUS_LABEL } from "@/components/ui/Badge";
-import { AdminNav } from "@/components/ui/AdminNav";
+
 import { useCurrentUser } from "@/lib/auth";
 import dynamic from "next/dynamic";
 const UserMenu = dynamic(
@@ -194,8 +194,8 @@ export default function AdminPage() {
       backHref="/"
       backLabel="Go home"
       maxWidth="max-w-6xl"
-      nav={<AdminNav />}
       right={<UserMenu />}
+      roleNav
     >
       {!isAdmin ? (
         <section className="card card-pad animate-fade-up mx-auto mt-20 max-w-md text-center">

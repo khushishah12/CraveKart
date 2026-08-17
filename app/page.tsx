@@ -14,15 +14,15 @@ import {
 
 import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/Button";
-import { useIsAdmin, useIsRestaurantOwner } from "@/lib/auth";
+import { useIsAdmin, useIsRestaurantOwner, useCurrentUser } from "@/lib/auth";
 
 const UserMenu = dynamic(
   () => import("@/components/ui/UserMenu").then((m) => m.UserMenu),
   { ssr: false }
 );
 
-const AdminNav = dynamic(
-  () => import("@/components/ui/AdminNav").then((m) => m.AdminNav),
+const RoleNav = dynamic(
+  () => import("@/components/ui/RoleNav").then((m) => m.RoleNav),
   { ssr: false }
 );
 
@@ -36,6 +36,8 @@ const trust = [
 export default function HomePage() {
   const isAdmin = useIsAdmin();
   const isOwner = useIsRestaurantOwner();
+  const profile = useCurrentUser();
+  const isLoggedIn = !!profile;
 
   return (
     <div className="relative flex min-h-screen flex-col overflow-hidden">
@@ -47,17 +49,13 @@ export default function HomePage() {
       <header className="relative z-10 mx-auto w-full max-w-6xl px-4 py-5 sm:px-6">
         <div className="flex items-center gap-4">
           <Logo size="lg" />
-          {isAdmin && (
+          {isLoggedIn && (
             <div className="flex min-w-0 flex-1 justify-center overflow-x-auto">
-              <AdminNav />
+              <RoleNav />
             </div>
           )}
           <nav className="ml-auto flex shrink-0 items-center gap-2.5">
-            {isAdmin ? null : isOwner ? (
-              <Link href="/owner">
-                <Button size="sm">Restaurant Dashboard</Button>
-              </Link>
-            ) : (
+            {!isLoggedIn && (
               <>
                 <Link
                   href="/login"

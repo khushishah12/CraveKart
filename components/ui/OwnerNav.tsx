@@ -31,7 +31,7 @@ export function OwnerNav() {
 
   return (
     <nav
-      className="mt-6 inline-flex max-w-full items-center gap-1 overflow-x-auto rounded-full border border-beige-200 bg-beige-100/80 p-1 shadow-soft"
+      className="flex items-center gap-0.5"
       aria-label="Owner navigation"
     >
       {TABS.map((tab) => {
@@ -40,15 +40,16 @@ export function OwnerNav() {
           <Link
             key={tab.href}
             href={tab.href}
+            title={tab.label}
+            aria-label={tab.label}
             aria-current={active ? "page" : undefined}
-            className={`focus-ring inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200 ${
+            className={`focus-ring inline-flex size-8 shrink-0 items-center justify-center rounded-full transition-all duration-200 ${
               active
-                ? "bg-white text-ink-900 shadow-card"
-                : "text-ink-500 hover:text-primary-600"
+                ? "bg-primary-600 text-white shadow-soft"
+                : "text-ink-500 hover:bg-white/70 hover:text-primary-600"
             }`}
           >
-            <tab.icon className={`size-4 ${active ? "text-primary-600" : ""}`} />
-            {tab.label}
+            <tab.icon className={`size-4 ${active ? "" : ""}`} />
           </Link>
         );
       })}

@@ -258,6 +258,7 @@ export default function ProductPage() {
       backHref="/menu"
       backLabel="Back to menu"
       maxWidth="max-w-5xl"
+      roleNav
       right={
         <>
           <Link

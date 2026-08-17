@@ -125,7 +125,7 @@ export default function OrderDetailPage() {
 
   return (
     <RequireCustomer>
-      <PageShell backHref="/orders" backLabel="Back to orders" maxWidth="max-w-2xl">
+      <PageShell backHref="/orders" backLabel="Back to orders" maxWidth="max-w-2xl" roleNav>
         {loading ? (
           <Skeleton className="mt-8 h-[420px] rounded-3xl" />
         ) : error || !order ? (

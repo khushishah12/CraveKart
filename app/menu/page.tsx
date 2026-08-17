@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import {
   Check,
-  LayoutDashboard,
   MapPin,
   Plus,
   Search,
@@ -23,8 +22,11 @@ const UserMenu = dynamic(
   () => import("@/components/ui/UserMenu").then((m) => m.UserMenu),
   { ssr: false }
 );
+const RoleNav = dynamic(
+  () => import("@/components/ui/RoleNav").then((m) => m.RoleNav),
+  { ssr: false }
+);
 import { useCart } from "@/lib/cart";
-import { useIsAdmin } from "@/lib/auth";
 import { RequireCustomer } from "@/components/ui/RequireCustomer";
 
 type MenuItem = {
@@ -87,8 +89,6 @@ export default function MenuPage() {
   const [activeCuisine, setActiveCuisine] = useState<string | null>(null);
   const [activeRestaurant, setActiveRestaurant] = useState<string | null>(null);
   const [activePrice, setActivePrice] = useState<string | null>(null);
-
-  const isAdmin = useIsAdmin();
 
   // Debounced search term
   useEffect(() => {
@@ -161,33 +161,26 @@ export default function MenuPage() {
       <div className="animate-blob absolute -left-24 top-1/2 size-80 rounded-full bg-coral-400/10 blur-3xl [animation-delay:-8s]" />
 
       <header className="relative z-30 border-b border-white/50">
-        <div className="glass mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6">
-          <Link href="/" aria-label="CraveKart home" className="focus-ring rounded-xl">
+        <div className="glass mx-auto flex w-full max-w-6xl items-center gap-4 px-4 py-3.5 sm:px-6">
+          <Link href="/" aria-label="CraveKart home" className="focus-ring shrink-0 rounded-xl">
             <Logo size="md" />
           </Link>
-          <nav className="flex items-center gap-2.5">
-            {isAdmin ? (
-              <Link
-                href="/admin"
-                className="focus-ring inline-flex items-center gap-2 rounded-full border border-beige-200 bg-white px-4 py-2 text-sm font-semibold text-ink-700 shadow-soft transition-all duration-200 hover:border-primary-300 hover:text-primary-600 active:scale-95"
-              >
-                <LayoutDashboard className="size-4" />
-                Admin
-              </Link>
-            ) : (
-              <Link
-                href="/cart"
-                className="focus-ring relative inline-flex items-center gap-2 rounded-full border border-beige-200 bg-white px-4 py-2 text-sm font-semibold text-ink-700 shadow-soft transition-all duration-200 hover:border-primary-300 hover:text-primary-600 active:scale-95"
-              >
-                <ShoppingBag className="size-4" />
-                <span className="hidden sm:inline">Cart</span>
-                {cartCount > 0 && (
-                  <span className="absolute -right-1 -top-1 grid min-w-5 place-items-center rounded-full bg-primary-600 px-1 text-[11px] font-bold text-white shadow-glow">
-                    {cartCount}
-                  </span>
-                )}
-              </Link>
-            )}
+          <div className="flex min-w-0 flex-1 justify-center overflow-x-auto">
+            <RoleNav />
+          </div>
+          <nav className="flex shrink-0 items-center gap-2.5">
+            <Link
+              href="/cart"
+              className="focus-ring relative inline-flex items-center gap-2 rounded-full border border-beige-200 bg-white px-4 py-2 text-sm font-semibold text-ink-700 shadow-soft transition-all duration-200 hover:border-primary-300 hover:text-primary-600 active:scale-95"
+            >
+              <ShoppingBag className="size-4" />
+              <span className="hidden sm:inline">Cart</span>
+              {cartCount > 0 && (
+                <span className="absolute -right-1 -top-1 grid min-w-5 place-items-center rounded-full bg-primary-600 px-1 text-[11px] font-bold text-white shadow-glow">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
             <UserMenu />
           </nav>
         </div>

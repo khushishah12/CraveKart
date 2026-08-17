@@ -11,7 +11,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
-import { OwnerNav } from "@/components/ui/OwnerNav";
+
 import { useIsRestaurantOwner } from "@/lib/auth";
 
 const UserMenu = dynamic(
@@ -104,6 +104,7 @@ export default function OwnerRestaurantPage() {
       backLabel="Go home"
       maxWidth="max-w-6xl"
       right={<UserMenu />}
+      roleNav
     >
       {!isOwner ? (
         <section className="card card-pad animate-fade-up mx-auto mt-20 max-w-md text-center">
@@ -127,8 +128,6 @@ export default function OwnerRestaurantPage() {
             title="Restaurant Profile"
             subtitle="Manage your restaurant details and contact information."
           />
-          <OwnerNav />
-
           {loading ? (
             <div className="mt-8 space-y-4">
               {Array.from({ length: 6 }).map((_, i) => (

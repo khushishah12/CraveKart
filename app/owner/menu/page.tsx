@@ -22,7 +22,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { OwnerNav } from "@/components/ui/OwnerNav";
+
 import { useIsRestaurantOwner } from "@/lib/auth";
 
 const UserMenu = dynamic(
@@ -220,6 +220,7 @@ export default function OwnerMenuPage() {
       backLabel="Go home"
       maxWidth="max-w-6xl"
       right={<UserMenu />}
+      roleNav
     >
       {!isOwner ? (
         <section className="card card-pad animate-fade-up mx-auto mt-20 max-w-md text-center">
@@ -243,8 +244,6 @@ export default function OwnerMenuPage() {
             title="Menu Items"
             subtitle="Add, edit, or remove items from your restaurant menu."
           />
-          <OwnerNav />
-
           {notice && (
             <div
               className={`mt-4 rounded-2xl border px-4 py-3 text-sm font-medium ${

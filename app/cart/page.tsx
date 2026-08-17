@@ -121,6 +121,7 @@ export default function CartPage() {
       backLabel="Back to menu"
       maxWidth="max-w-5xl"
       right={<UserMenu />}
+      roleNav
     >
       <PageHeader
         icon={ShoppingBag}

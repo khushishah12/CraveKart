@@ -2,24 +2,34 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Receipt, UserRound } from "lucide-react";
+import {
+  ClipboardList,
+  LayoutDashboard,
+  MapPin,
+  ShoppingBag,
+  ShoppingCart,
+} from "lucide-react";
 
 const TABS = [
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/orders", label: "Orders", icon: Receipt },
-  { href: "/profile", label: "Profile", icon: UserRound },
+  { href: "/menu", label: "Menu", icon: LayoutDashboard },
+  { href: "/orders", label: "Orders", icon: ClipboardList },
+  { href: "/cart", label: "Cart", icon: ShoppingCart },
+  { href: "/track", label: "Track", icon: MapPin },
+  { href: "/profile", label: "Profile", icon: ShoppingBag },
 ];
 
-export function AdminNav() {
+export function CustomerNav() {
   const pathname = usePathname();
 
   return (
     <nav
       className="flex items-center gap-0.5"
-      aria-label="Admin navigation"
+      aria-label="Customer navigation"
     >
       {TABS.map((tab) => {
-        const active = pathname === tab.href;
+        const active =
+          pathname === tab.href ||
+          (tab.href !== "/menu" && tab.href !== "/cart" && tab.href !== "/track" && pathname.startsWith(tab.href));
         return (
           <Link
             key={tab.href}

@@ -7,7 +7,7 @@ import { PageShell } from "@/components/ui/PageShell";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { StatCard } from "@/components/ui/StatCard";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { OwnerNav } from "@/components/ui/OwnerNav";
+
 import { useIsRestaurantOwner } from "@/lib/auth";
 import dynamic from "next/dynamic";
 
@@ -77,7 +77,7 @@ export default function AnalyticsPage() {
     : 1;
 
   return (
-    <PageShell backHref="/" backLabel="Go home" right={<UserMenu />} maxWidth="max-w-6xl">
+    <PageShell backHref="/" backLabel="Go home" right={<UserMenu />} maxWidth="max-w-6xl" roleNav>
       {!isOwner ? (
         <section className="card card-pad animate-fade-up mx-auto mt-20 max-w-md text-center">
           <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-beige-100 text-2xl">
@@ -95,8 +95,6 @@ export default function AnalyticsPage() {
             title="Analytics"
             subtitle="Insights into your restaurant's performance."
           />
-          <OwnerNav />
-
           {loading ? (
             <div className="mt-8">
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">

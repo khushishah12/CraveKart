@@ -39,7 +39,7 @@ export default function OrdersPage() {
 
   return (
     <RequireCustomer>
-    <PageShell backHref="/menu" backLabel="Back to menu" maxWidth="max-w-3xl">
+    <PageShell backHref="/menu" backLabel="Back to menu" maxWidth="max-w-3xl" roleNav>
       <PageHeader
         icon={Receipt}
         title="Your orders"

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { PageShell } from "@/components/ui/PageShell";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge, statusTone, STATUS_LABEL } from "@/components/ui/Badge";
-import { AdminNav } from "@/components/ui/AdminNav";
+
 import { useCurrentUser } from "@/lib/auth";
 import dynamic from "next/dynamic";
 const UserMenu = dynamic(
@@ -83,8 +83,8 @@ export default function AdminOrdersPage() {
       backHref="/admin"
       backLabel="Back to dashboard"
       maxWidth="max-w-5xl"
-      nav={<AdminNav />}
       right={<UserMenu />}
+      roleNav
     >
       {!isAdmin ? (
         <section className="card card-pad animate-fade-up mx-auto mt-20 max-w-md text-center">

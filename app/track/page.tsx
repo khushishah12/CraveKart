@@ -34,7 +34,7 @@ export default function TrackPage() {
 
   return (
     <RequireCustomer>
-    <PageShell backHref="/" backLabel="Go home" maxWidth="max-w-2xl">
+    <PageShell backHref="/" backLabel="Go home" maxWidth="max-w-2xl" roleNav>
       <PageHeader
         icon={PackageSearch}
         title="Track your order"

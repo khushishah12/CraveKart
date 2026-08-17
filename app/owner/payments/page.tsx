@@ -9,7 +9,7 @@ import { StatCard } from "@/components/ui/StatCard";
 import { Badge } from "@/components/ui/Badge";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { OwnerNav } from "@/components/ui/OwnerNav";
+
 import { useIsRestaurantOwner } from "@/lib/auth";
 import dynamic from "next/dynamic";
 
@@ -58,7 +58,7 @@ export default function PaymentsPage() {
     .reduce((s, p) => s + Number(p.amount || 0), 0);
 
   return (
-    <PageShell backHref="/" backLabel="Go home" right={<UserMenu />} maxWidth="max-w-6xl">
+    <PageShell backHref="/" backLabel="Go home" right={<UserMenu />} maxWidth="max-w-6xl" roleNav>
       {!isOwner ? (
         <section className="card card-pad animate-fade-up mx-auto mt-20 max-w-md text-center">
           <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-beige-100 text-2xl">
@@ -76,8 +76,6 @@ export default function PaymentsPage() {
             title="Payments"
             subtitle="View all payment records for your restaurant."
           />
-          <OwnerNav />
-
           {loading ? (
             <div className="mt-8">
               <Skeleton className="h-24 rounded-3xl" />

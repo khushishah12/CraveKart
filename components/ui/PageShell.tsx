@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { Logo } from "@/components/ui/Logo";
+import { RoleNav } from "@/components/ui/RoleNav";
 
 export function PageShell({
   children,
@@ -12,6 +13,7 @@ export function PageShell({
   nav,
   right,
   stickyHeader = true,
+  roleNav = false,
 }: {
   children: ReactNode;
   maxWidth?: string;
@@ -20,6 +22,7 @@ export function PageShell({
   nav?: ReactNode;
   right?: ReactNode;
   stickyHeader?: boolean;
+  roleNav?: boolean;
 }) {
   return (
     <div className="relative flex min-h-screen flex-col overflow-hidden">
@@ -46,9 +49,9 @@ export function PageShell({
                 <Logo size="md" />
               </Link>
             </div>
-            {nav && (
+            {(nav || roleNav) && (
               <div className="flex min-w-0 flex-1 justify-center overflow-x-auto">
-                {nav}
+                {roleNav ? <RoleNav /> : nav}
               </div>
             )}
             {right && (

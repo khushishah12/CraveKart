@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/Input";
 import { PageShell } from "@/components/ui/PageShell";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge } from "@/components/ui/Badge";
-import { AdminNav } from "@/components/ui/AdminNav";
+
 import { useCurrentUser, useIsAdmin } from "@/lib/auth";
 
 function initials(name: string | null | undefined): string {
@@ -154,7 +154,7 @@ export default function ProfilePage() {
       backHref="/"
       backLabel="Go home"
       maxWidth="max-w-2xl"
-      nav={isAdmin ? <AdminNav /> : undefined}
+      roleNav
     >
       <PageHeader
         icon={UserRound}

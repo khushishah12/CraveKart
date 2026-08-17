@@ -8,7 +8,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { OwnerNav } from "@/components/ui/OwnerNav";
+
 import { useIsRestaurantOwner } from "@/lib/auth";
 import dynamic from "next/dynamic";
 
@@ -119,7 +119,7 @@ export default function KitchenPage() {
   };
 
   return (
-    <PageShell backHref="/" backLabel="Go home" right={<UserMenu />} maxWidth="max-w-6xl">
+    <PageShell backHref="/" backLabel="Go home" right={<UserMenu />} maxWidth="max-w-6xl" roleNav>
       {!isOwner ? (
         <section className="card card-pad animate-fade-up mx-auto mt-20 max-w-md text-center">
           <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-beige-100 text-2xl">
@@ -142,8 +142,6 @@ export default function KitchenPage() {
               </Badge>
             }
           />
-          <OwnerNav />
-
           {loading ? (
             <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 6 }).map((_, i) => (
