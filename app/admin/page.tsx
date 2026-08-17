@@ -194,6 +194,7 @@ export default function AdminPage() {
       backHref="/"
       backLabel="Go home"
       maxWidth="max-w-6xl"
+      nav={<AdminNav />}
       right={<UserMenu />}
     >
       {!isAdmin ? (
@@ -233,7 +234,6 @@ export default function AdminPage() {
               </>
             }
           />
-          <AdminNav />
           <nav
             className="mt-4 inline-flex max-w-full items-center gap-1 overflow-x-auto rounded-full border border-beige-200 bg-beige-100/80 p-1 shadow-soft"
             aria-label="Admin tabs"

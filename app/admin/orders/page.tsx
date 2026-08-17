@@ -83,6 +83,7 @@ export default function AdminOrdersPage() {
       backHref="/admin"
       backLabel="Back to dashboard"
       maxWidth="max-w-5xl"
+      nav={<AdminNav />}
       right={<UserMenu />}
     >
       {!isAdmin ? (
@@ -107,7 +108,6 @@ export default function AdminOrdersPage() {
             title="Orders"
             subtitle="Everything your customers have ordered, in one place."
           />
-          <AdminNav />
 
           {result && (
             <div

@@ -9,6 +9,7 @@ export function PageShell({
   maxWidth = "max-w-4xl",
   backHref = "/",
   backLabel = "Go back",
+  nav,
   right,
   stickyHeader = true,
 }: {
@@ -16,6 +17,7 @@ export function PageShell({
   maxWidth?: string;
   backHref?: string;
   backLabel?: string;
+  nav?: ReactNode;
   right?: ReactNode;
   stickyHeader?: boolean;
 }) {
@@ -30,22 +32,29 @@ export function PageShell({
           stickyHeader ? "sticky top-0" : ""
         }`}
       >
-        <div className="glass mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6">
-          <div className="flex min-w-0 items-center gap-3">
-            <Link
-              href={backHref}
-              aria-label={backLabel}
-              className="focus-ring grid size-9 shrink-0 place-items-center rounded-full border border-beige-200 bg-white/80 text-ink-700 shadow-soft transition-all duration-200 hover:border-primary-300 hover:text-primary-600 active:scale-95"
-            >
-              <ArrowLeft className="size-4" />
-            </Link>
-            <Link href="/" aria-label="CraveKart home" className="focus-ring rounded-xl">
-              <Logo size="md" />
-            </Link>
+        <div className="glass mx-auto w-full max-w-6xl px-4 py-3.5 sm:px-6">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="flex min-w-0 shrink-0 items-center gap-3">
+              <Link
+                href={backHref}
+                aria-label={backLabel}
+                className="focus-ring grid size-9 shrink-0 place-items-center rounded-full border border-beige-200 bg-white/80 text-ink-700 shadow-soft transition-all duration-200 hover:border-primary-300 hover:text-primary-600 active:scale-95"
+              >
+                <ArrowLeft className="size-4" />
+              </Link>
+              <Link href="/" aria-label="CraveKart home" className="focus-ring rounded-xl">
+                <Logo size="md" />
+              </Link>
+            </div>
+            {nav && (
+              <div className="flex min-w-0 flex-1 justify-center overflow-x-auto">
+                {nav}
+              </div>
+            )}
+            {right && (
+              <nav className="flex shrink-0 items-center gap-2.5">{right}</nav>
+            )}
           </div>
-          {right && (
-            <nav className="flex shrink-0 items-center gap-2.5">{right}</nav>
-          )}
         </div>
       </header>
 

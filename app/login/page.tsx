@@ -3,10 +3,9 @@
 import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Mail, UserRound } from "lucide-react";
+import { Mail } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/client";
-import { AUTH_EVENT } from "@/lib/cart";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";

@@ -150,14 +150,17 @@ export default function ProfilePage() {
   }
 
   return (
-    <PageShell backHref="/" backLabel="Go home" maxWidth="max-w-2xl">
+    <PageShell
+      backHref="/"
+      backLabel="Go home"
+      maxWidth="max-w-2xl"
+      nav={isAdmin ? <AdminNav /> : undefined}
+    >
       <PageHeader
         icon={UserRound}
         title="Your profile"
         subtitle="Manage your account details and preferences."
       />
-
-      {isAdmin && <AdminNav />}
 
       <section className="card card-pad mt-8">
         <div className="flex flex-wrap items-center gap-4">

@@ -13,6 +13,7 @@ import {
 
 import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/Button";
+import { AdminNav } from "@/components/ui/AdminNav";
 import { useIsAdmin } from "@/lib/auth";
 
 
@@ -34,27 +35,30 @@ export default function HomePage() {
       <div className="animate-blob absolute -right-24 top-1/3 size-80 rounded-full bg-coral-400/20 blur-3xl [animation-delay:-7s]" />
       <div className="absolute bottom-0 left-1/2 h-64 w-[70rem] max-w-full -translate-x-1/2 rounded-full bg-white/40 blur-3xl" />
 
-      <header className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
-        <Logo size="lg" />
-        <nav className="flex items-center gap-2.5">
-          {isAdmin ? (
-            <Link href="/admin">
-              <Button size="sm">Dashboard</Button>
-            </Link>
-          ) : (
-            <>
-              <Link
-                href="/login"
-                className="focus-ring rounded-full px-4 py-2 text-sm font-semibold text-ink-700 transition-colors hover:text-primary-600"
-              >
-                Sign in
-              </Link>
-              <Link href="/register">
-                <Button size="sm">Get started</Button>
-              </Link>
-            </>
+      <header className="relative z-10 mx-auto w-full max-w-6xl px-4 py-5 sm:px-6">
+        <div className="flex items-center gap-4">
+          <Logo size="lg" />
+          {isAdmin && (
+            <div className="flex min-w-0 flex-1 justify-center overflow-x-auto">
+              <AdminNav />
+            </div>
           )}
-        </nav>
+          <nav className="ml-auto flex shrink-0 items-center gap-2.5">
+            {isAdmin ? null : (
+              <>
+                <Link
+                  href="/login"
+                  className="focus-ring rounded-full px-4 py-2 text-sm font-semibold text-ink-700 transition-colors hover:text-primary-600"
+                >
+                  Sign in
+                </Link>
+                <Link href="/register">
+                  <Button size="sm">Get started</Button>
+                </Link>
+              </>
+            )}
+          </nav>
+        </div>
       </header>
 
       <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col items-center justify-center px-4 pb-20 text-center sm:px-6">
