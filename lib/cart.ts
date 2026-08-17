@@ -11,6 +11,7 @@ export type UserProfile = {
   role?: string;
   phone?: string | null;
   delivery_address?: string | null;
+  restaurant_id?: string | null;
 };
 
 // Broadcast events so open pages stay in sync across tabs/actions.

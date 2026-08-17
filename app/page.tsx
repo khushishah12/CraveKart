@@ -13,11 +13,6 @@ import {
 
 import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/Button";
-import { AdminNav } from "@/components/ui/AdminNav";
-import { useIsAdmin } from "@/lib/auth";
-
-
-
 const trust = [
   { icon: Timer, label: "30-min delivery" },
   { icon: ShieldCheck, label: "Secure checkout" },
@@ -27,6 +22,7 @@ const trust = [
 
 export default function HomePage() {
   const isAdmin = useIsAdmin();
+  const isOwner = useIsRestaurantOwner();
 
   return (
     <div className="relative flex min-h-screen flex-col overflow-hidden">
@@ -35,6 +31,7 @@ export default function HomePage() {
       <div className="animate-blob absolute -right-24 top-1/3 size-80 rounded-full bg-coral-400/20 blur-3xl [animation-delay:-7s]" />
       <div className="absolute bottom-0 left-1/2 h-64 w-[70rem] max-w-full -translate-x-1/2 rounded-full bg-white/40 blur-3xl" />
 
+<<<<<<< HEAD
       <header className="relative z-10 mx-auto w-full max-w-6xl px-4 py-5 sm:px-6">
         <div className="flex items-center gap-4">
           <Logo size="lg" />
@@ -42,6 +39,31 @@ export default function HomePage() {
             <div className="flex min-w-0 flex-1 justify-center overflow-x-auto">
               <AdminNav />
             </div>
+=======
+      <header className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
+        <Logo size="lg" />
+        <nav className="flex items-center gap-2.5">
+          {isAdmin ? (
+            <Link href="/admin">
+              <Button size="sm">Dashboard</Button>
+            </Link>
+          ) : isOwner ? (
+            <Link href="/owner">
+              <Button size="sm">Restaurant Dashboard</Button>
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="focus-ring rounded-full px-4 py-2 text-sm font-semibold text-ink-700 transition-colors hover:text-primary-600"
+              >
+                Sign in
+              </Link>
+              <Link href="/register">
+                <Button size="sm">Get started</Button>
+              </Link>
+            </>
+>>>>>>> 86e8a7d (feat:add restaurant owner role)
           )}
           <nav className="ml-auto flex shrink-0 items-center gap-2.5">
             {isAdmin ? null : (
@@ -96,6 +118,49 @@ export default function HomePage() {
               </Link>
               <Link href="/admin/orders" className="transition-colors hover:text-primary-600">
                 Orders
+              </Link>
+              <Link href="/profile" className="transition-colors hover:text-primary-600">
+                Profile
+              </Link>
+            </footer>
+          </>
+        ) : isOwner ? (
+          <>
+            <span className="glass inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[13px] font-semibold text-ink-700">
+              <Flame className="size-3.5 text-primary-600" />
+              Restaurant dashboard
+            </span>
+            <h1 className="mt-6 max-w-2xl text-5xl font-extrabold leading-[1.06] tracking-tight text-ink-900 sm:text-6xl">
+              Manage your{" "}
+              <span className="bg-gradient-to-r from-primary-600 to-coral-500 bg-clip-text text-transparent">
+                restaurant
+              </span>
+            </h1>
+            <p className="mt-5 max-w-xl text-lg text-ink-500">
+              Accept orders, manage your menu, track revenue, and engage with
+              customers — all from your restaurant dashboard.
+            </p>
+            <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+              <Link href="/owner">
+                <Button size="lg">
+                  Open dashboard <ArrowRight className="size-4" />
+                </Button>
+              </Link>
+              <Link href="/owner/orders">
+                <Button size="lg" variant="secondary">
+                  View orders <Receipt className="size-4" />
+                </Button>
+              </Link>
+            </div>
+            <footer className="mt-16 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-ink-500">
+              <Link href="/owner" className="transition-colors hover:text-primary-600">
+                Dashboard
+              </Link>
+              <Link href="/owner/orders" className="transition-colors hover:text-primary-600">
+                Orders
+              </Link>
+              <Link href="/owner/menu" className="transition-colors hover:text-primary-600">
+                Menu
               </Link>
               <Link href="/profile" className="transition-colors hover:text-primary-600">
                 Profile

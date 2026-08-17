@@ -12,6 +12,7 @@ const demoUsers = [
   { email: "admin@cravekart.app", password: "admin123", name: "Ava Admin" },
   { email: "priya@cravekart.app", password: "priya123", name: "Priya Sharma" },
   { email: "alex@cravekart.app", password: "alex123", name: "Alex Rivera" },
+  { email: "owner@cravekart.app", password: "owner123", name: "Riya Patel" },
 ];
 
 const { data: listed } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
@@ -36,6 +37,23 @@ for (const u of demoUsers) {
   if (error) {
     console.error("FAIL", u.email, error.message);
   } else {
-    console.log("OK", u.email, data.user?.id ?? "(no id returned)");
+    const authId = data.user?.id;
+    console.log("OK", u.email, authId ?? "(no id returned)");
+    // For restaurant_owner, update the profile row to match the auth user ID
+    if (u.email === "owner@cravekart.app" && authId) {
+      // Delete the old profile row with the seed UUID
+      await supabase.from("users").delete().eq("email", u.email);
+      // Insert with the correct auth user ID
+      await supabase.from("users").insert({
+        id: authId,
+        email: u.email,
+        name: u.name,
+        role: "restaurant_owner",
+        phone: "+91-9876543210",
+      });
+      // Link restaurant to this owner
+      await supabase.from("restaurants").update({ owner_id: authId }).eq("name", "Pizza Palace");
+      console.log("OK linked Pizza Palace to", authId);
+    }
   }
 }

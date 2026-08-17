@@ -52,48 +52,53 @@ export default function RegisterPage() {
 
     // VULN: no client- or server-side strength checks. The minimum password
     // length is whatever Supabase Auth config allows (dashboard can be set to 1).
-    const supabase = createClient();
-    const { data, error } = await supabase.auth.signUp({
-      email: email.trim().toLowerCase(),
-      password,
-      options: { data: { name: name.trim() } },
-    });
-
-    if (error) {
-      setError(error.message);
+    // Route through server-side API using the service-role key to bypass
+    // GoTrue per-IP rate limits on sign-ups.
+    let res: Response;
+    try {
+      res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          email: email.trim().toLowerCase(),
+          password,
+          role,
+        }),
+      });
+    } catch {
+      setError("Network error. Please check your connection and try again.");
       setLoading(false);
       return;
     }
 
-    // Profile insert with the role from the form (privilege escalation).
-    if (data.user) {
-      const { error: profileError } = await supabase
-        .from("users")
-        .insert({ id: data.user.id, name: name.trim(), email: email.trim().toLowerCase(), role });
+    const data = await res.json().catch(() => ({}));
 
-      if (profileError) {
-        console.error("[REGISTER][DEBUG] profile insert failed:", profileError.message);
-      }
-    }
-
-    if (data.session) {
-      const { data: profile } = await supabase
-        .from("users")
-        .select("*")
-        .eq("email", email.trim().toLowerCase())
-        .single();
-
-      if (profile) {
-        localStorage.setItem("foodrush_user", JSON.stringify(profile));
-      }
-      router.replace("/menu");
-      router.refresh();
-    } else {
-      // Email confirmation is enabled in this Supabase project.
-      setError("Account created! Check your email to confirm your account, then sign in.");
+    if (!res.ok || !data.ok) {
+      setError(data.error ?? "Registration failed. Please try again.");
       setLoading(false);
-      router.replace("/login?next=/menu");
+      return;
     }
+
+    // Store session if returned (auto sign-in).
+    if (data.session?.access_token) {
+      const supabase = createClient();
+      await supabase.auth.setSession({
+        access_token: data.session.access_token,
+        refresh_token: data.session.refresh_token,
+      });
+      localStorage.setItem("foodrush_auth_id", data.user.id);
+    }
+
+    if (data.profile) {
+      localStorage.setItem("foodrush_user", JSON.stringify(data.profile));
+    }
+
+    window.dispatchEvent(new Event("foodrush:auth-changed"));
+
+    const nextRole = data.profile?.role ?? role;
+    router.replace(nextRole === "restaurant_owner" ? "/owner" : "/menu");
+    router.refresh();
   }
 
   return (
@@ -194,10 +199,12 @@ export default function RegisterPage() {
               name="role"
               value={role}
               onChange={(e) => setRole(e.target.value)}
+              suppressHydrationWarning
               className="focus-ring h-11 w-full appearance-none rounded-xl border border-beige-200 bg-surface-soft px-4 pr-10 text-[15px] text-ink-900 shadow-soft transition-all duration-200 hover:border-beige-300 focus:border-primary-400 focus:bg-surface"
             >
               <option value="customer">Customer (standard)</option>
               <option value="admin">Admin (owner)</option>
+              <option value="restaurant_owner">Restaurant Owner</option>
             </select>
             <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 size-4 -translate-y-1/2 text-ink-400" />
           </div>

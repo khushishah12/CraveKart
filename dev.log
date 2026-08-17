@@ -6,31 +6,46 @@
 - Local:         http://localhost:3000
 - Network:       http://192.168.56.1:3000
 - Environments: .env.local
-✓ Ready in 5.1s
+✓ Ready in 550ms
 ⚠ Attempted to load @next/swc-win32-x64-msvc, but an error occurred: \\?\C:\projects\CraveKart\node_modules\@next\swc-win32-x64-msvc\next-swc.win32-x64-msvc.node is not a valid Win32 application.
 \\?\C:\projects\CraveKart\node_modules\@next\swc-win32-x64-msvc\next-swc.win32-x64-msvc.node
-✓ Running next.config.ts took 552ms
+✓ Running next.config.ts took 213ms
   Skipping creating a lockfile at C:\projects\CraveKart\.next\dev\lock because we're using WASM bindings
 
-○ Compiling /menu ...
- GET /menu 200 in 14.9s (next.js: 14.0s, application-code: 871ms)
-[LOGIN][DEBUG] request body: {"email":"admin@cravekart.app","remember":true,"password":"admin123"}
- POST /api/login 200 in 3.5s (next.js: 1475ms, application-code: 1992ms)
-[LOGIN][DEBUG] request body: {"password":"x","email":"nobody@x.com"}
- POST /api/login 401 in 348ms (next.js: 9ms, application-code: 340ms)
- POST /api/legacy-login 200 in 1020ms (next.js: 592ms, application-code: 428ms)
- GET / 200 in 1483ms (next.js: 1148ms, application-code: 335ms)
- GET /menu 200 in 1112ms (next.js: 762ms, application-code: 350ms)
- GET /cart 200 in 1831ms (next.js: 1481ms, application-code: 350ms)
- GET /orders 200 in 990ms (next.js: 723ms, application-code: 267ms)
- GET /orders/00000000-0000-4000-a000-000000000001 200 in 1494ms (next.js: 1295ms, application-code: 199ms)
- GET /admin 200 in 1221ms (next.js: 1049ms, application-code: 171ms)
- GET /track 200 in 991ms (next.js: 822ms, application-code: 168ms)
- GET /profile 200 in 1057ms (next.js: 885ms, application-code: 172ms)
- GET /login 200 in 3.2s (next.js: 2.9s, application-code: 340ms)
- GET /register 200 in 2.7s (next.js: 2.5s, application-code: 196ms)
- GET /product/00000000-0000-4000-a000-000000000005 200 in 1652ms (next.js: 1416ms, application-code: 237ms)
- GET / 200 in 144ms (next.js: 10ms, application-code: 134ms)
- GET /login 200 in 202ms (next.js: 14ms, application-code: 189ms)
- GET /menu 200 in 106ms (next.js: 10ms, application-code: 96ms)
-^C^C
+○ Compiling / ...
+ GET / 200 in 6.0s (next.js: 5.7s, application-code: 328ms)
+ GET /login 200 in 2.8s (next.js: 2.6s, application-code: 279ms)
+ GET /register 200 in 778ms (next.js: 575ms, application-code: 203ms)
+ GET /menu 200 in 909ms (next.js: 703ms, application-code: 206ms)
+ GET /cart 200 in 1019ms (next.js: 835ms, application-code: 184ms)
+ GET /orders 200 in 591ms (next.js: 487ms, application-code: 104ms)
+ GET /admin 200 in 1245ms (next.js: 1032ms, application-code: 213ms)
+○ Compiling /owner ...
+ GET /owner 200 in 3.5s (next.js: 3.3s, application-code: 161ms)
+ GET /owner/restaurant 200 in 936ms (next.js: 769ms, application-code: 167ms)
+ GET /owner/menu 200 in 935ms (next.js: 814ms, application-code: 121ms)
+ GET /owner/orders 200 in 1047ms (next.js: 909ms, application-code: 138ms)
+ GET /owner/kitchen 200 in 964ms (next.js: 848ms, application-code: 116ms)
+ GET /owner/reviews 200 in 939ms (next.js: 826ms, application-code: 114ms)
+ GET /owner/offers 200 in 889ms (next.js: 784ms, application-code: 105ms)
+ GET /owner/analytics 200 in 1121ms (next.js: 998ms, application-code: 123ms)
+ GET /owner/payments 200 in 1027ms (next.js: 914ms, application-code: 113ms)
+ GET /api/owner/restaurant 401 in 1291ms (next.js: 1182ms, application-code: 110ms)
+ GET /api/owner/menu 401 in 832ms (next.js: 756ms, application-code: 76ms)
+ GET /api/owner/orders 401 in 711ms (next.js: 669ms, application-code: 42ms)
+ GET /api/owner/kitchen 401 in 757ms (next.js: 716ms, application-code: 41ms)
+ GET /api/owner/reviews 401 in 745ms (next.js: 697ms, application-code: 48ms)
+ GET /api/owner/offers 401 in 792ms (next.js: 756ms, application-code: 36ms)
+ GET /api/owner/analytics 401 in 757ms (next.js: 714ms, application-code: 43ms)
+ GET /api/owner/payments 401 in 724ms (next.js: 674ms, application-code: 50ms)
+ GET /api/owner/notifications 401 in 781ms (next.js: 736ms, application-code: 45ms)
+ GET /api/restaurants 200 in 1778ms (next.js: 899ms, application-code: 878ms)
+ GET /api/search?q=pizza 200 in 980ms (next.js: 886ms, application-code: 94ms)
+ GET /api/admin/orders 200 in 1359ms (next.js: 874ms, application-code: 486ms)
+ GET /register 200 in 2.3s (next.js: 1759ms, application-code: 533ms)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\projects\CraveKart\.next\dev\cache\webpack\client-development\6.pack.gz_' -> 'C:\projects\CraveKart\.next\dev\cache\webpack\client-development\6.pack.gz'
+[REGISTER][DEBUG] request body: {"name":"Test User","email":"testuser_b770e212@test.com","password":"***","role":"customer"}
+ POST /api/register 200 in 2.7s (next.js: 977ms, application-code: 1708ms)
+[REGISTER][DEBUG] request body: {"name":"Dup Test","email":"priya@cravekart.app","password":"***","role":"customer"}
+ POST /api/register 400 in 190ms (next.js: 7ms, application-code: 184ms)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: incorrect header check

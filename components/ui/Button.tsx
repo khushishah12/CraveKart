@@ -33,6 +33,7 @@ export const Button = forwardRef<HTMLButtonElement, Props>(
       <button
         ref={ref}
         disabled={disabled || loading}
+        suppressHydrationWarning
         className={`focus-ring inline-flex select-none items-center justify-center font-semibold transition-all duration-200 will-change-transform disabled:cursor-not-allowed disabled:opacity-60 ${variants[variant]} ${sizes[size]} ${className}`}
         {...rest}
       >

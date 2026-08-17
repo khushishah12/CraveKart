@@ -149,6 +149,16 @@ export function UserMenu() {
               Admin dashboard
             </Link>
           )}
+          {user.role === "restaurant_owner" && (
+            <Link
+              href="/owner"
+              onClick={() => setOpen(false)}
+              className="focus-ring mt-1 flex w-full items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-ink-700 transition-colors hover:bg-beige-100 hover:text-primary-600"
+            >
+              <Shield className="size-4" />
+              Restaurant dashboard
+            </Link>
+          )}
           <button
             onClick={signOut}
             className="focus-ring mt-1 flex w-full items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-coral-500 transition-colors hover:bg-coral-400/10"

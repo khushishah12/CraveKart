@@ -7,6 +7,10 @@ export function isAdminUser(): boolean {
   return getCurrentUser()?.role === "admin";
 }
 
+export function isRestaurantOwnerUser(): boolean {
+  return getCurrentUser()?.role === "restaurant_owner";
+}
+
 // useSyncExternalStore requires getSnapshot to return a stable value between
 // renders unless the store actually changed (otherwise React sees an
 // always-changed snapshot and re-renders in an infinite loop). The profile
@@ -43,6 +47,14 @@ function getServerSnapshot() {
 
 export function useIsAdmin(): boolean {
   return useSyncExternalStore(subscribe, isAdminUser, getServerSnapshot);
+}
+
+function getServerSnapshotOwner() {
+  return false;
+}
+
+export function useIsRestaurantOwner(): boolean {
+  return useSyncExternalStore(subscribe, isRestaurantOwnerUser, getServerSnapshotOwner);
 }
 
 function getProfileSnapshot(): UserProfile | null {

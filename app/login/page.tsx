@@ -104,7 +104,7 @@ function LoginContent() {
     const requested = searchParams.get("next");
     const next =
       requested ??
-      (role === "admin" ? "/admin" : "/menu");
+      (role === "admin" ? "/admin" : role === "restaurant_owner" ? "/owner" : "/menu");
     router.replace(next);
     router.refresh();
   }

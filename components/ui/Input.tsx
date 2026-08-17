@@ -16,6 +16,7 @@ export const Input = forwardRef<HTMLInputElement, Props>(
         )}
         <input
           ref={ref}
+          suppressHydrationWarning
           className={`focus-ring h-11 w-full rounded-xl border bg-surface-soft px-4 text-[15px] text-ink-900 shadow-soft placeholder:text-ink-400 transition-all duration-200 hover:border-beige-300 focus:border-primary-400 focus:bg-surface ${
             icon ? "pl-11" : ""
           } ${
