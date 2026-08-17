@@ -87,11 +87,12 @@ export default function AdminPage() {
   const [restaurants, setRestaurants] = useState<Record<string, string>>({});
   const [payments, setPayments] = useState<Payment[]>([]);
   const [coupons, setCoupons] = useState<Coupon[]>([]);
-  const [notice, setNotice] = useState<{ ok: boolean; message: string } | null>(null);
 
+  const [activeTab, setActiveTab] = useState<"users" | "orders" | "menu" | "payments" | "coupons">("users");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState(emptyDraft);
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [notice, setNotice] = useState<{ ok: boolean; message: string } | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // VULN (A01): access control is CLIENT-SIDE ONLY. profile.role comes from
@@ -233,7 +234,32 @@ export default function AdminPage() {
             }
           />
           <AdminNav />
-
+          <nav
+            className="mt-4 inline-flex max-w-full items-center gap-1 overflow-x-auto rounded-full border border-beige-200 bg-beige-100/80 p-1 shadow-soft"
+            aria-label="Admin tabs"
+          >
+            {([
+              { key: "users", label: "Users", icon: Users },
+              { key: "orders", label: "Orders", icon: Receipt },
+              { key: "menu", label: "Menu Items", icon: Pizza },
+              { key: "payments", label: "Payments", icon: CreditCard },
+              { key: "coupons", label: "Coupons", icon: Receipt },
+            ] as const).map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                aria-current={activeTab === tab.key ? "page" : undefined}
+                className={`focus-ring inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200 ${
+                  activeTab === tab.key
+                    ? "bg-white text-ink-900 shadow-card"
+                    : "text-ink-500 hover:text-primary-600"
+                }`}
+              >
+                <tab.icon className={`size-4 ${activeTab === tab.key ? "text-primary-600" : ""}`} />
+                {tab.label}
+              </button>
+            ))}
+          </nav>
           {loading ? (
             <div className="mt-8">
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -264,327 +290,230 @@ export default function AdminPage() {
                   {notice.message}
                 </div>
               )}
-
+              {activeTab === "users" && (
               <section className="card overflow-hidden">
-                <div className="flex items-center justify-between border-b border-beige-100 px-6 py-4">
-                  <h2 className="flex items-center gap-2 font-bold text-ink-900">
-                    <Users className="size-5 text-primary-600" />
-                    All users
-                  </h2>
-                  <Badge tone="neutral">{users.length} total</Badge>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm">
-                    <thead className="bg-cream">
-                      <tr className="border-b border-beige-100">
-                        <th className={tableHead}>Name</th>
-                        <th className={tableHead}>Email</th>
-                        <th className={tableHead}>Role</th>
-                        <th className={tableHead}>Password (MD5)</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-beige-100">
-                      {users.map((u) => (
-                        <tr key={u.id} className="transition-colors hover:bg-cream/70">
-                          <td className={`${tableCell} font-semibold text-ink-900`}>{u.name ?? "—"}</td>
-                          <td className={`${tableCell} text-ink-700`}>{u.email}</td>
-                          <td className={tableCell}>
-                            <Badge tone={u.role === "admin" ? "brand" : "neutral"}>{u.role}</Badge>
-                          </td>
-                          <td className={`${tableCell} font-mono text-xs text-ink-500`}>
-                            {u.password_md5 ?? "—"}
-                          </td>
+                  <div className="flex items-center justify-between border-b border-beige-100 px-6 py-4">
+                    <h2 className="flex items-center gap-2 font-bold text-ink-900">
+                      <Users className="size-5 text-primary-600" />
+                      All users
+                    </h2>
+                    <Badge tone="neutral">{users.length} total</Badge>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-sm">
+                      <thead className="bg-cream">
+                        <tr className="border-b border-beige-100">
+                          <th className={tableHead}>Name</th>
+                          <th className={tableHead}>Email</th>
+                          <th className={tableHead}>Role</th>
+                          <th className={tableHead}>Password (MD5)</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-
-              <section className="card overflow-hidden">
-                <div className="flex items-center justify-between border-b border-beige-100 px-6 py-4">
-                  <h2 className="flex items-center gap-2 font-bold text-ink-900">
-                    <Receipt className="size-5 text-primary-600" />
-                    All orders
-                  </h2>
-                  <Link
-                    href="/admin/orders"
-                    className="text-sm font-semibold text-primary-600 transition-colors hover:text-primary-700"
-                  >
-                    Open orders view →
-                  </Link>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm">
-                    <thead className="bg-cream">
-                      <tr className="border-b border-beige-100">
-                        <th className={tableHead}>Order</th>
-                        <th className={tableHead}>Customer</th>
-                        <th className={tableHead}>Items</th>
-                        <th className={tableHead}>Total</th>
-                        <th className={tableHead}>Status</th>
-                        <th className={tableHead}>Card</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-beige-100">
-                      {orders.map((o) => {
-                        const owner = o.user_id ? userById.get(o.user_id) : null;
-                        return (
-                          <tr key={o.id} className="transition-colors hover:bg-cream/70">
+                      </thead>
+                      <tbody className="divide-y divide-beige-100">
+                        {users.map((u) => (
+                          <tr key={u.id} className="transition-colors hover:bg-cream/70">
+                            <td className={`${tableCell} font-semibold text-ink-900`}>{u.name ?? "—"}</td>
+                            <td className={`${tableCell} text-ink-700`}>{u.email}</td>
                             <td className={tableCell}>
-                              <Link
-                                href={`/orders/${o.id}`}
-                                className="font-mono text-xs font-semibold text-primary-600 transition-colors hover:text-primary-700"
-                              >
-                                #{o.id}
-                              </Link>
-                              <p className="mt-0.5 text-xs text-ink-400">
-                                {new Date(o.created_at).toLocaleString()}
-                              </p>
+                              <Badge tone={u.role === "admin" ? "brand" : "neutral"}>{u.role}</Badge>
                             </td>
-                            <td className={`${tableCell} text-ink-700`}>
-                              {owner?.email ?? "guest"}
-                            </td>
-                            <td className={`${tableCell} text-ink-600`}>
-                              {(o.items ?? []).map((it) => it.name ?? "Item").join(", ")}
-                            </td>
-                            <td className={`${tableCell} font-bold tabular text-ink-900`}>
-                              {money(o.total)}
-                            </td>
-                            <td className={tableCell}>
-                              <Badge tone={statusTone(o.status)} dot>
-                                {STATUS_LABEL[o.status] ?? o.status}
-                              </Badge>
-                            </td>
-                            <td className={`${tableCell} font-mono text-xs text-ink-500`}>
-                              {o.cc_number ?? "—"}
-                            </td>
+                            <td className={`${tableCell} font-mono text-xs text-ink-500`}>{u.password_md5 ?? "—"}</td>
                           </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              )}
 
+              {activeTab === "orders" && (
               <section className="card overflow-hidden">
-                <div className="flex items-center justify-between border-b border-beige-100 px-6 py-4">
-                  <h2 className="flex items-center gap-2 font-bold text-ink-900">
-                    <Pizza className="size-5 text-primary-600" />
-                    Menu items
-                  </h2>
-                  <Badge tone="neutral">{items.length} items</Badge>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm">
-                    <thead className="bg-cream">
-                      <tr className="border-b border-beige-100">
-                        <th className={tableHead}>Name</th>
-                        <th className={tableHead}>Restaurant</th>
-                        <th className={tableHead}>Category</th>
-                        <th className={tableHead}>Price</th>
-                        <th className={`${tableHead} text-right`}>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-beige-100">
-                      {items.map((it) => {
-                        const editing = editingId === it.id;
-                        return (
-                          <tr key={it.id} className="transition-colors hover:bg-cream/70">
-                            <td className={tableCell}>
-                              {editing ? (
-                                <div className="space-y-2">
-                                  <input
-                                    value={draft.name}
-                                    onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))}
-                                    className="focus-ring h-9 w-full rounded-lg border border-beige-200 bg-surface-soft px-3 text-sm text-ink-900"
-                                    placeholder="Item name"
-                                    aria-label="Item name"
-                                  />
-                                  <textarea
-                                    value={draft.description}
-                                    onChange={(e) => setDraft((d) => ({ ...d, description: e.target.value }))}
-                                    className="focus-ring w-full rounded-lg border border-beige-200 bg-surface-soft px-3 py-2 text-sm text-ink-900"
-                                    placeholder="Description"
-                                    rows={2}
-                                    aria-label="Item description"
-                                  />
-                                </div>
-                              ) : (
-                                <>
-                                  <p className="font-semibold text-ink-900">
-                                    {it.image_url} {it.name}
-                                  </p>
-                                  <p className="mt-0.5 line-clamp-1 max-w-xs text-xs text-ink-400">
-                                    {it.description ?? ""}
-                                  </p>
-                                </>
-                              )}
-                            </td>
-                            <td className={`${tableCell} text-ink-600`}>
-                              {restaurants[it.restaurant_id ?? ""] ?? "—"}
-                            </td>
-                            <td className={tableCell}>
-                              {editing ? (
-                                <input
-                                  value={draft.category}
-                                  onChange={(e) => setDraft((d) => ({ ...d, category: e.target.value }))}
-                                  className="focus-ring h-9 w-28 rounded-lg border border-beige-200 bg-surface-soft px-3 text-sm text-ink-900"
-                                  placeholder="Category"
-                                  aria-label="Category"
-                                />
-                              ) : (
-                                <Badge tone="neutral">{it.category ?? "—"}</Badge>
-                              )}
-                            </td>
-                            <td className={tableCell}>
-                              {editing ? (
-                                <div className="relative">
-                                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-ink-400">
-                                    ₹
-                                  </span>
-                                  <input
-                                    value={draft.price}
-                                    onChange={(e) => setDraft((d) => ({ ...d, price: e.target.value }))}
-                                    className="focus-ring h-9 w-24 rounded-lg border border-beige-200 bg-surface-soft pl-7 pr-3 text-sm text-ink-900 tabular"
-                                    placeholder="0.00"
-                                    inputMode="decimal"
-                                    aria-label="Price"
-                                  />
-                                </div>
-                              ) : (
-                                <span className="font-bold tabular text-ink-900">{money(it.price)}</span>
-                              )}
-                            </td>
-                            <td className={`${tableCell} text-right`}>
-                              {editing ? (
-                                <div className="flex justify-end gap-2">
-                                  <Button size="sm" loading={savingId === it.id} onClick={() => saveItem(it.id)}>
-                                    <Save className="size-4" />
-                                    Save
-                                  </Button>
-                                  <Button size="sm" variant="secondary" onClick={() => setEditingId(null)}>
-                                    <X className="size-4" />
-                                    Cancel
-                                  </Button>
-                                </div>
-                              ) : (
-                                <div className="flex justify-end gap-2">
-                                  <Button size="sm" variant="secondary" onClick={() => startEdit(it)}>
-                                    <Pencil className="size-4" />
-                                    Edit
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    variant="danger"
-                                    loading={deletingId === it.id}
-                                    onClick={() => deleteItem(it.id)}
-                                  >
-                                    <Trash2 className="size-4" />
-                                    Delete
-                                  </Button>
-                                </div>
-                              )}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-
-              <section className="card overflow-hidden">
-                <div className="flex items-center justify-between border-b border-beige-100 px-6 py-4">
-                  <h2 className="flex items-center gap-2 font-bold text-ink-900">
-                    <CreditCard className="size-5 text-primary-600" />
-                    Payment records
-                  </h2>
-                  <Badge tone="neutral">{payments.length} records</Badge>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm">
-                    <thead className="bg-cream">
-                      <tr className="border-b border-beige-100">
-                        <th className={tableHead}>Payment</th>
-                        <th className={tableHead}>Order</th>
-                        <th className={tableHead}>Amount</th>
-                        <th className={tableHead}>Card</th>
-                        <th className={tableHead}>Full number</th>
-                        <th className={tableHead}>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-beige-100">
-                      {payments.map((p) => (
-                        <tr key={p.id} className="transition-colors hover:bg-cream/70">
-                          <td className={tableCell}>
-                            <p className="font-mono text-xs font-semibold text-ink-900">#{p.id}</p>
-                            <p className="mt-0.5 text-xs text-ink-400">
-                              {new Date(p.created_at).toLocaleString()}
-                            </p>
-                          </td>
-                          <td className={`${tableCell} font-mono text-xs text-ink-600`}>
-                            {p.order_id ? `#${p.order_id}` : "—"}
-                          </td>
-                          <td className={`${tableCell} font-bold tabular text-ink-900`}>
-                            {money(p.amount)}
-                          </td>
-                          <td className={`${tableCell} text-ink-600`}>
-                            {p.card_brand ?? "—"} ····{p.card_last4 ?? "—"}
-                          </td>
-                          <td className={`${tableCell} font-mono text-xs text-ink-500`}>
-                            {p.cc_number ?? "—"}
-                          </td>
-                          <td className={tableCell}>
-                            <Badge tone={p.status === "succeeded" ? "success" : "warning"} dot>
-                              {p.status}
-                            </Badge>
-                          </td>
+                  <div className="flex items-center justify-between border-b border-beige-100 px-6 py-4">
+                    <h2 className="flex items-center gap-2 font-bold text-ink-900">
+                      <Receipt className="size-5 text-primary-600" />
+                      All orders
+                    </h2>
+                    <Badge tone="neutral">{orders.length} orders</Badge>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-sm">
+                      <thead className="bg-cream">
+                        <tr className="border-b border-beige-100">
+                          <th className={tableHead}>Order</th>
+                          <th className={tableHead}>Customer</th>
+                          <th className={tableHead}>Items</th>
+                          <th className={tableHead}>Total</th>
+                          <th className={tableHead}>Status</th>
+                          <th className={tableHead}>Card</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
+                      </thead>
+                      <tbody className="divide-y divide-beige-100">
+                        {orders.map((o) => {
+                          const owner = o.user_id ? userById.get(o.user_id) : null;
+                          return (
+                            <tr key={o.id} className="transition-colors hover:bg-cream/70">
+                              <td className={tableCell}>
+                                <Link href={`/orders/${o.id}`} className="font-mono text-xs font-semibold text-primary-600 transition-colors hover:text-primary-700">#{o.id}</Link>
+                                <p className="mt-0.5 text-xs text-ink-400">{new Date(o.created_at).toLocaleString()}</p>
+                              </td>
+                              <td className={`${tableCell} text-ink-700`}>{owner?.email ?? "guest"}</td>
+                              <td className={`${tableCell} text-ink-600`}>{(o.items ?? []).map((it) => it.name ?? "Item").join(", ")}</td>
+                              <td className={`${tableCell} font-bold tabular text-ink-900`}>{money(o.total)}</td>
+                              <td className={tableCell}><Badge tone={statusTone(o.status)} dot>{STATUS_LABEL[o.status] ?? o.status}</Badge></td>
+                              <td className={`${tableCell} font-mono text-xs text-ink-500`}>{o.cc_number ?? "—"}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              )}
 
+              {activeTab === "menu" && (
               <section className="card overflow-hidden">
-                <div className="flex items-center justify-between border-b border-beige-100 px-6 py-4">
-                  <h2 className="flex items-center gap-2 font-bold text-ink-900">
-                    <Receipt className="size-5 text-primary-600" />
-                    Coupons
-                  </h2>
-                  <Badge tone="neutral">{coupons.length} active</Badge>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm">
-                    <thead className="bg-cream">
-                      <tr className="border-b border-beige-100">
-                        <th className={tableHead}>Code</th>
-                        <th className={tableHead}>Discount</th>
-                        <th className={tableHead}>Uses</th>
-                        <th className={tableHead}>Max</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-beige-100">
-                      {coupons.map((c) => {
-                        const usedUp = c.uses >= c.max_uses;
-                        return (
-                          <tr key={c.id} className="transition-colors hover:bg-cream/70">
-                            <td className={`${tableCell} font-mono font-semibold text-ink-900`}>{c.code}</td>
-                            <td className={`${tableCell} text-ink-700`}>₹{c.discount}</td>
+                  <div className="flex items-center justify-between border-b border-beige-100 px-6 py-4">
+                    <h2 className="flex items-center gap-2 font-bold text-ink-900">
+                      <Pizza className="size-5 text-primary-600" />
+                      Menu items
+                    </h2>
+                    <Badge tone="neutral">{items.length} items</Badge>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-sm">
+                      <thead className="bg-cream">
+                        <tr className="border-b border-beige-100">
+                          <th className={tableHead}>Name</th>
+                          <th className={tableHead}>Restaurant</th>
+                          <th className={tableHead}>Category</th>
+                          <th className={tableHead}>Price</th>
+                          <th className={`${tableHead} text-right`}>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-beige-100">
+                        {items.map((it) => {
+                          const editing = editingId === it.id;
+                          return (
+                            <tr key={it.id} className="transition-colors hover:bg-cream/70">
+                              <td className={tableCell}>
+                                {editing ? (
+                                  <div className="space-y-2">
+                                    <input value={draft.name} onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))} className="focus-ring h-9 w-full rounded-lg border border-beige-200 bg-surface-soft px-3 text-sm text-ink-900" placeholder="Item name" aria-label="Item name" />
+                                    <textarea value={draft.description} onChange={(e) => setDraft((d) => ({ ...d, description: e.target.value }))} className="focus-ring w-full rounded-lg border border-beige-200 bg-surface-soft px-3 py-2 text-sm text-ink-900" placeholder="Description" rows={2} aria-label="Item description" />
+                                  </div>
+                                ) : (
+                                  <>
+                                    <p className="font-semibold text-ink-900">{it.image_url} {it.name}</p>
+                                    <p className="mt-0.5 line-clamp-1 max-w-xs text-xs text-ink-400">{it.description ?? ""}</p>
+                                  </>
+                                )}
+                              </td>
+                              <td className={`${tableCell} text-ink-600`}>{restaurants[it.restaurant_id ?? ""] ?? "—"}</td>
+                              <td className={tableCell}>{editing ? (<input value={draft.category} onChange={(e) => setDraft((d) => ({ ...d, category: e.target.value }))} className="focus-ring h-9 w-28 rounded-lg border border-beige-200 bg-surface-soft px-3 text-sm text-ink-900" placeholder="Category" aria-label="Category" />) : (<Badge tone="neutral">{it.category ?? "—"}</Badge>)}</td>
+                              <td className={tableCell}>{editing ? (<div className="relative"><span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-ink-400">₹</span><input value={draft.price} onChange={(e) => setDraft((d) => ({ ...d, price: e.target.value }))} className="focus-ring h-9 w-24 rounded-lg border border-beige-200 bg-surface-soft pl-7 pr-3 text-sm text-ink-900 tabular" placeholder="0.00" inputMode="decimal" aria-label="Price" /></div>) : (<span className="font-bold tabular text-ink-900">{money(it.price)}</span>)}</td>
+                              <td className={`${tableCell} text-right`}>
+                                {editing ? (
+                                  <div className="flex justify-end gap-2">
+                                    <Button size="sm" loading={savingId === it.id} onClick={() => saveItem(it.id)}><Save className="size-4" /> Save</Button>
+                                    <Button size="sm" variant="secondary" onClick={() => setEditingId(null)}><X className="size-4" /> Cancel</Button>
+                                  </div>
+                                ) : (
+                                  <div className="flex justify-end gap-2">
+                                    <Button size="sm" variant="secondary" onClick={() => startEdit(it)}><Pencil className="size-4" /> Edit</Button>
+                                    <Button size="sm" variant="danger" loading={deletingId === it.id} onClick={() => deleteItem(it.id)}><Trash2 className="size-4" /> Delete</Button>
+                                  </div>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              )}
+
+              {activeTab === "payments" && (
+              <section className="card overflow-hidden">
+                  <div className="flex items-center justify-between border-b border-beige-100 px-6 py-4">
+                    <h2 className="flex items-center gap-2 font-bold text-ink-900">
+                      <CreditCard className="size-5 text-primary-600" />
+                      Payment records
+                    </h2>
+                    <Badge tone="neutral">{payments.length} records</Badge>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-sm">
+                      <thead className="bg-cream">
+                        <tr className="border-b border-beige-100">
+                          <th className={tableHead}>Payment</th>
+                          <th className={tableHead}>Order</th>
+                          <th className={tableHead}>Amount</th>
+                          <th className={tableHead}>Card</th>
+                          <th className={tableHead}>Full number</th>
+                          <th className={tableHead}>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-beige-100">
+                        {payments.map((p) => (
+                          <tr key={p.id} className="transition-colors hover:bg-cream/70">
                             <td className={tableCell}>
-                              <Badge tone={usedUp ? "danger" : "neutral"} dot>
-                                {c.uses}
-                              </Badge>
+                              <p className="font-mono text-xs font-semibold text-ink-900">#{p.id}</p>
+                              <p className="mt-0.5 text-xs text-ink-400">{new Date(p.created_at).toLocaleString()}</p>
                             </td>
-                            <td className={`${tableCell} text-ink-700 tabular`}>{c.max_uses}</td>
+                            <td className={`${tableCell} font-mono text-xs text-ink-600`}>{p.order_id ? `#${p.order_id}` : "—"}</td>
+                            <td className={`${tableCell} font-bold tabular text-ink-900`}>{money(p.amount)}</td>
+                            <td className={`${tableCell} text-ink-600`}>{p.card_brand ?? "—"} ····{p.card_last4 ?? "—"}</td>
+                            <td className={`${tableCell} font-mono text-xs text-ink-500`}>{p.cc_number ?? "—"}</td>
+                            <td className={tableCell}>
+                              <Badge tone={p.status === "succeeded" ? "success" : "warning"} dot>{p.status}</Badge>
+                            </td>
                           </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              )}
+
+              {activeTab === "coupons" && (
+              <section className="card overflow-hidden">
+                  <div className="flex items-center justify-between border-b border-beige-100 px-6 py-4">
+                    <h2 className="flex items-center gap-2 font-bold text-ink-900">
+                      <Receipt className="size-5 text-primary-600" />
+                      Coupons
+                    </h2>
+                    <Badge tone="neutral">{coupons.length} active</Badge>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-sm">
+                      <thead className="bg-cream">
+                        <tr className="border-b border-beige-100">
+                          <th className={tableHead}>Code</th>
+                          <th className={tableHead}>Discount</th>
+                          <th className={tableHead}>Uses</th>
+                          <th className={tableHead}>Max</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-beige-100">
+                        {coupons.map((c) => {
+                          const usedUp = c.uses >= c.max_uses;
+                          return (
+                            <tr key={c.id} className="transition-colors hover:bg-cream/70">
+                              <td className={`${tableCell} font-mono font-semibold text-ink-900`}>{c.code}</td>
+                              <td className={`${tableCell} text-ink-700`}>₹{c.discount}</td>
+                              <td className={tableCell}>
+                                <Badge tone={usedUp ? "danger" : "neutral"} dot>{c.uses}</Badge>
+                              </td>
+                              <td className={`${tableCell} text-ink-700 tabular`}>{c.max_uses}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              )}
             </div>
           )}
         </>
