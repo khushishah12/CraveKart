@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Bike,
   Check,
   ChefHat,
   Clock,
   CreditCard,
+  HandPlatter,
   Home,
   MapPin,
   PackageCheck,
@@ -30,6 +31,7 @@ type Order = {
   id: number;
   user_id: string | null;
   restaurant_name: string;
+  restaurant_id: string | null;
   items: CartLine[];
   total: number;
   status: string;
@@ -43,20 +45,56 @@ type Order = {
 // public.orders. There is deliberately NO `.eq("user_id", …)` filter: pass
 // any integer id (1001, 1002, …) and you read someone else's order — and
 // their stored card number (A02). Integer ids are sequential and guessable.
-const STEPS = ["Placed", "Preparing", "Out for Delivery", "Delivered"] as const;
-const STEP_ICONS = [Home, ChefHat, Bike, PackageCheck];
+const STEPS = [
+  { label: "Placed", icon: Home },
+  { label: "Preparing", icon: ChefHat },
+  { label: "Ready", icon: HandPlatter },
+  { label: "On the Way", icon: Bike },
+  { label: "Delivered", icon: PackageCheck },
+] as const;
 
 function statusStep(status: string): number {
   switch (status) {
     case "preparing":
       return 1;
-    case "on_the_way":
+    case "ready":
       return 2;
-    case "delivered":
+    case "on_the_way":
       return 3;
+    case "delivered":
+      return 4;
     default:
       return 0;
   }
+}
+
+function statusMessage(status: string): string {
+  switch (status) {
+    case "pending":
+      return "Your order has been placed and is waiting for the restaurant to accept.";
+    case "preparing":
+      return "The kitchen is preparing your food right now.";
+    case "ready":
+      return "Your order is ready and waiting for pickup by the delivery partner.";
+    case "on_the_way":
+      return "Your order is on its way to you! Hang tight.";
+    case "delivered":
+      return "Your order has been delivered. Enjoy your meal!";
+    case "cancelled":
+      return "This order has been cancelled.";
+    default:
+      return "";
+  }
+}
+
+function estimatedTime(status: string, createdAt: string): string | null {
+  if (status === "delivered" || status === "cancelled") return null;
+  const base = new Date(createdAt).getTime();
+  const now = Date.now();
+  const elapsed = (now - base) / 1000 / 60;
+  const remaining = Math.max(0, 30 - elapsed);
+  if (remaining === 0) return "Arriving any moment";
+  return `~${Math.ceil(remaining)} min remaining`;
 }
 
 function foodEmoji(name: string): string {
@@ -84,10 +122,14 @@ export default function OrderDetailPage() {
   const [order, setOrder] = useState<Order | null>(null);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [now, setNow] = useState(() => Date.now());
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Initial fetch + polling every 5 seconds while order is active
   useEffect(() => {
     let active = true;
-    (async () => {
+
+    async function fetchOrder() {
       const supabase = createClient();
       // No user_id filter — rely solely on (absent) RLS.
       let query = supabase.from("orders").select("*");
@@ -96,27 +138,49 @@ export default function OrderDetailPage() {
       const { data, error: err } = await query.single();
       if (!active) return;
       if (err || !data) setError(true);
-      else setOrder(data as unknown as Order);
+      else {
+        setOrder(data as unknown as Order);
+        // Stop polling if terminal state
+        const s = (data as Record<string, string>).status;
+        if (s === "delivered" || s === "cancelled") {
+          if (intervalRef.current) clearInterval(intervalRef.current);
+        }
+      }
       setLoading(false);
-    })();
+    }
+
+    fetchOrder();
+    intervalRef.current = setInterval(fetchOrder, 5000);
+
     return () => {
       active = false;
+      if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [params.id]);
+
+  // Tick every second for the ETA countdown
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
 
   const current = order ? statusStep(order.status) : 0;
   const subtotal = (order?.items ?? []).reduce(
     (s, it) => s + (Number(it.price) || 0) * (Number(it.qty) || 1),
     0
   );
+  const eta = order ? estimatedTime(order.status, order.created_at) : null;
 
   function orderAgain() {
-    for (const line of order?.items ?? []) {
+    if (!order) return;
+    for (const line of order.items ?? []) {
       if (line.name) {
         addItemToCart({
           id: line.id ?? line.name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
           name: line.name,
           price: line.price ?? 0,
+          restaurant_id: order.restaurant_id ?? undefined,
+          restaurant_name: order.restaurant_name,
         });
       }
     }
@@ -146,33 +210,47 @@ export default function OrderDetailPage() {
                 <Badge tone={statusTone(order.status)} dot>
                   {STATUS_LABEL[order.status] ?? order.status}
                 </Badge>
-                <span className="font-mono text-xs text-ink-400">
-                  Order #{order.id}
-                </span>
+                <div className="flex items-center gap-3">
+                  {eta && (
+                    <span className="flex items-center gap-1.5 text-sm font-semibold text-primary-600">
+                      <Clock className="size-4" />
+                      {eta}
+                    </span>
+                  )}
+                  <span className="font-mono text-xs text-ink-400">
+                    Order #{order.id}
+                  </span>
+                </div>
               </div>
               <h1 className="heading mt-4 text-2xl sm:text-3xl">
                 {order.restaurant_name}
               </h1>
               <p className="mt-1.5 flex items-center gap-1.5 text-sm text-ink-500">
                 <Clock className="size-4" />
-                {new Date(order.created_at).toLocaleString()}
+                Placed {new Date(order.created_at).toLocaleString()}
               </p>
 
+              {/* Status message */}
+              <p className="mt-4 rounded-xl bg-primary-50 px-4 py-3 text-sm font-medium text-primary-700">
+                {statusMessage(order.status)}
+              </p>
+
+              {/* Progress stepper */}
               <div className="mt-8" aria-label="Order status">
                 <ol className="flex items-start">
-                  {STEPS.map((label, i) => {
+                  {STEPS.map((step, i) => {
                     const done = i < current;
                     const active = i === current;
-                    const Icon = STEP_ICONS[i];
+                    const Icon = step.icon;
                     return (
-                      <li key={label} className="flex flex-1 items-center last:flex-none">
+                      <li key={step.label} className="flex flex-1 items-center last:flex-none">
                         <div className="flex w-14 flex-col items-center gap-1.5 text-center">
                           <span
                             className={`grid size-9 place-items-center rounded-full border-2 transition-all duration-300 ${
                               done
                                 ? "border-primary-500 bg-primary-500 text-white shadow-glow"
                                 : active
-                                  ? "border-primary-500 bg-white text-primary-600 shadow-glow"
+                                  ? "border-primary-500 bg-white text-primary-600 shadow-glow animate-pulse"
                                   : "border-beige-200 bg-white text-ink-400"
                             }`}
                           >
@@ -189,7 +267,7 @@ export default function OrderDetailPage() {
                               done || active ? "text-primary-700" : "text-ink-400"
                             }`}
                           >
-                            {label}
+                            {step.label}
                           </span>
                         </div>
                         {i < STEPS.length - 1 && (
@@ -204,6 +282,14 @@ export default function OrderDetailPage() {
                   })}
                 </ol>
               </div>
+
+              {/* Auto-refresh indicator */}
+              {order.status !== "delivered" && order.status !== "cancelled" && (
+                <p className="mt-4 flex items-center gap-1.5 text-center text-xs text-ink-400">
+                  <span className="inline-block size-1.5 animate-pulse rounded-full bg-sage-500" />
+                  Live tracking — updates every 5 seconds
+                </p>
+              )}
             </section>
 
             <section className="card card-pad mt-5">

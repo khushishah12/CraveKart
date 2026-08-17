@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireOwner } from "@/lib/owner-auth";
 import { createClient } from "@/lib/supabase/server";
 
-const VALID_STATUSES = ["preparing", "ready", "out_for_delivery", "delivered", "cancelled"];
+const VALID_STATUSES = ["preparing", "ready", "on_the_way", "delivered", "cancelled"];
 
 type Params = Promise<{ id: string }>;
 
@@ -55,7 +55,17 @@ export async function PATCH(request: NextRequest, { params }: { params: Params }
       await supabase.from("notifications").insert({
         user_id: order.user_id,
         title: "Order Ready",
-        message: `Your order #${order.id} is ready!`,
+        message: `Your order #${order.id} is ready for pickup!`,
+        type: "order",
+        link: `/orders/${order.id}`,
+      });
+    }
+
+    if (status === "on_the_way" && order.user_id) {
+      await supabase.from("notifications").insert({
+        user_id: order.user_id,
+        title: "Order On The Way",
+        message: `Your order #${order.id} is on its way to you!`,
         type: "order",
         link: `/orders/${order.id}`,
       });

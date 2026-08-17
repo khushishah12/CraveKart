@@ -1,16 +1,17 @@
 import { NextResponse } from "next/server";
 
-type CartItem = { id?: string; name?: string; price?: number; qty?: number };
+type CartItem = { id?: string; name?: string; price?: number; qty?: number; restaurant_id?: string; restaurant_name?: string };
 type CheckoutBody = {
   items?: CartItem[];
   card?: { number?: string; expiry?: string; cvv?: string; name?: string };
   email?: string;
   delivery_address?: string;
+  user_id?: string;
 };
 
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => ({}))) as CheckoutBody;
-  const { items = [], card = {}, email, delivery_address } = body;
+  const { items = [], card = {}, delivery_address, user_id } = body;
 
   const address = String(delivery_address ?? "").trim();
 
@@ -36,9 +37,12 @@ export async function POST(request: Request) {
 
   // VULN (business logic): the total is trusted from the client. A crafted
   // request can set prices/qty to anything (e.g. 0.01) and checkout anyway.
+  // The restaurant info is derived from the cart items (client-trusted).
+  const firstItem = items[0] as CartItem;
   const order = {
-    user_id: email ? null : null,
-    restaurant_name: "Order Summary",
+    user_id: user_id || null,
+    restaurant_name: firstItem?.restaurant_name || "Order Summary",
+    restaurant_id: firstItem?.restaurant_id || null,
     items,
     total,
     status: "pending",

@@ -98,6 +98,7 @@ export default function CartPage() {
           items: cart,
           card: { name: cardName, number: cardNumber, expiry, cvv },
           delivery_address: address,
+          user_id: profile?.id ?? null,
         }),
       });
       const data = await res.json();

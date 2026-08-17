@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-export type CartLine = { id: string; name: string; price: number; qty: number };
+export type CartLine = { id: string; name: string; price: number; qty: number; restaurant_id?: string; restaurant_name?: string };
 
 export type UserProfile = {
   id?: string;
@@ -51,11 +51,11 @@ export function saveCart(cart: CartLine[]) {
   window.dispatchEvent(new Event(CART_EVENT));
 }
 
-export function addItemToCart(item: Pick<CartLine, "id" | "name" | "price">): CartLine[] {
+export function addItemToCart(item: Pick<CartLine, "id" | "name" | "price" | "restaurant_id" | "restaurant_name">): CartLine[] {
   const cart = loadCart();
   const existing = cart.find((c) => c.id === item.id);
   if (existing) existing.qty += 1;
-  else cart.push({ id: item.id, name: item.name, price: item.price, qty: 1 });
+  else cart.push({ id: item.id, name: item.name, price: item.price, qty: 1, restaurant_id: item.restaurant_id, restaurant_name: item.restaurant_name });
   saveCart(cart);
   return cart;
 }
@@ -90,7 +90,7 @@ export function useCart() {
     };
   }, []);
 
-  const add = useCallback((item: Pick<CartLine, "id" | "name" | "price">) => {
+  const add = useCallback((item: Pick<CartLine, "id" | "name" | "price" | "restaurant_id" | "restaurant_name">) => {
     setCart(addItemToCart(item));
   }, []);
 

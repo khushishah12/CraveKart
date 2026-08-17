@@ -36,6 +36,10 @@ export function statusTone(status: string): BadgeTone {
       return "success";
     case "on_the_way":
       return "brand";
+    case "ready":
+      return "info";
+    case "preparing":
+      return "info";
     case "pending":
       return "warning";
     case "cancelled":
@@ -47,6 +51,8 @@ export function statusTone(status: string): BadgeTone {
 
 export const STATUS_LABEL: Record<string, string> = {
   pending: "Pending",
+  preparing: "Preparing",
+  ready: "Ready",
   on_the_way: "On the way",
   delivered: "Delivered",
   cancelled: "Cancelled",

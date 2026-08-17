@@ -293,7 +293,13 @@ export default function MenuPage() {
                         onClick={() =>
                           inCart
                             ? removeFromCart(item.id)
-                            : addToCart({ id: item.id, name: item.name, price: item.price })
+                            : addToCart({
+                                id: item.id,
+                                name: item.name,
+                                price: item.price,
+                                restaurant_id: item.restaurant_id,
+                                restaurant_name: rest?.name ?? "Restaurant",
+                              })
                         }
                         aria-label={
                           inCart
