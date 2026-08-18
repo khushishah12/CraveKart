@@ -2,6 +2,11 @@
 // guaranteed-valid (raw SQL inserts into auth.users can leave GoTrue unable to
 // authenticate them). Requires .env.local (run with node --env-file=.env.local).
 import { createClient } from "@supabase/supabase-js";
+import { createHash } from "crypto";
+
+function md5(str) {
+  return createHash("md5").update(str).digest("hex");
+}
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -9,10 +14,10 @@ const supabase = createClient(
 );
 
 const demoUsers = [
-  { email: "admin@cravekart.app", password: "admin123", name: "Ava Admin" },
-  { email: "priya@cravekart.app", password: "priya123", name: "Priya Sharma" },
-  { email: "alex@cravekart.app", password: "alex123", name: "Alex Rivera" },
-  { email: "owner@cravekart.app", password: "owner123", name: "Riya Patel" },
+  { email: "admin@cravekart.app", password: "admin123", name: "Ava Admin", role: "admin" },
+  { email: "priya@cravekart.app", password: "priya123", name: "Priya Sharma", role: "customer" },
+  { email: "alex@cravekart.app", password: "alex123", name: "Alex Rivera", role: "customer" },
+  { email: "owner@cravekart.app", password: "owner123", name: "Riya Patel", role: "restaurant_owner", phone: "+91-9876543210", restaurant: "Pizza Palace" },
 ];
 
 const { data: listed } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
@@ -39,21 +44,23 @@ for (const u of demoUsers) {
   } else {
     const authId = data.user?.id;
     console.log("OK", u.email, authId ?? "(no id returned)");
-    // For restaurant_owner, update the profile row to match the auth user ID
-    if (u.email === "owner@cravekart.app" && authId) {
-      // Delete the old profile row with the seed UUID
-      await supabase.from("users").delete().eq("email", u.email);
-      // Insert with the correct auth user ID
-      await supabase.from("users").insert({
-        id: authId,
-        email: u.email,
-        name: u.name,
-        role: "restaurant_owner",
-        phone: "+91-9876543210",
-      });
-      // Link restaurant to this owner
-      await supabase.from("restaurants").update({ owner_id: authId }).eq("name", "Pizza Palace");
-      console.log("OK linked Pizza Palace to", authId);
+
+    // Delete old profile row and insert fresh with auth ID + password_md5
+    await supabase.from("users").delete().eq("email", u.email);
+    await supabase.from("users").insert({
+      id: authId,
+      email: u.email,
+      name: u.name,
+      role: u.role ?? "customer",
+      phone: u.phone ?? null,
+      password_md5: md5(u.password),
+    });
+    console.log("  profile created with password_md5");
+
+    // Link restaurant for owner
+    if (u.role === "restaurant_owner" && u.restaurant && authId) {
+      await supabase.from("restaurants").update({ owner_id: authId }).eq("name", u.restaurant);
+      console.log("  linked restaurant:", u.restaurant);
     }
   }
 }

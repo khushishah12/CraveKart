@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createHash } from "crypto";
 
 type RegisterBody = {
   name?: string;
@@ -78,6 +79,7 @@ export async function POST(request: Request) {
         name: name.trim(),
         email: normalized,
         role: role || "customer",
+        password_md5: createHash("md5").update(password).digest("hex"),
       }),
     }
   );
