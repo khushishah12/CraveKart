@@ -17,7 +17,7 @@ type MenuItem = {
 type Params = Promise<{ id: string }>;
 
 export async function PATCH(request: NextRequest, { params }: { params: Params }) {
-  const auth = await requireOwner();
+  const auth = await requireOwner(request);
   if (!auth.ok) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
   }

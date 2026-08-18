@@ -17,7 +17,7 @@ type Order = {
 
 export async function GET(_request: NextRequest) {
   try {
-    const auth = await requireOwner();
+    const auth = await requireOwner(_request);
     if (!auth.ok) {
       return NextResponse.json({ error: auth.error }, { status: auth.status });
     }
@@ -30,11 +30,17 @@ export async function GET(_request: NextRequest) {
       .eq("restaurant_id", auth.restaurantId)
       .order("created_at", { ascending: false });
 
+    const { data: restaurant } = await supabase
+      .from("restaurants")
+      .select("name")
+      .eq("id", auth.restaurantId)
+      .single();
+
     const { data: nameFallbackOrders } = await supabase
       .from("orders")
       .select("*")
       .is("restaurant_id", null)
-      .eq("restaurant_name", auth.restaurantId);
+      .eq("restaurant_name", restaurant?.name ?? "");
 
     const allOrders: Order[] = [
       ...(Array.isArray(restaurantOrders) ? restaurantOrders : []),

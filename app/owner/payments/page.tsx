@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 
 import { useIsRestaurantOwner } from "@/lib/auth";
+import { ownerFetch } from "@/lib/owner-fetch";
 import dynamic from "next/dynamic";
 
 const UserMenu = dynamic(
@@ -43,7 +44,7 @@ export default function PaymentsPage() {
 
   useEffect(() => {
     let active = true;
-    fetch("/api/owner/payments")
+    ownerFetch("/api/owner/payments")
       .then((r) => r.json())
       .then((d) => active && setPayments(d.payments ?? []))
       .catch(() => null)

@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 
 import { useIsRestaurantOwner } from "@/lib/auth";
+import { ownerFetch } from "@/lib/owner-fetch";
 import dynamic from "next/dynamic";
 
 const UserMenu = dynamic(
@@ -75,7 +76,7 @@ export default function OffersPage() {
 
   useEffect(() => {
     let active = true;
-    fetch("/api/owner/offers")
+    ownerFetch("/api/owner/offers")
       .then((r) => r.json())
       .then((d) => active && setOffers(d.offers ?? []))
       .catch(() => null)
@@ -125,7 +126,7 @@ export default function OffersPage() {
       const body = editingId
         ? { ...draft, id: editingId }
         : draft;
-      const r = await fetch(url, {
+      const r = await ownerFetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -160,7 +161,7 @@ export default function OffersPage() {
     if (!window.confirm("Delete this offer?")) return;
     setDeletingId(id);
     try {
-      const r = await fetch("/api/owner/offers", {
+      const r = await ownerFetch("/api/owner/offers", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),

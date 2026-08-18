@@ -83,10 +83,14 @@ export default function RegisterPage() {
     // Store session if returned (auto sign-in).
     if (data.session?.access_token) {
       const supabase = createClient();
-      await supabase.auth.setSession({
-        access_token: data.session.access_token,
-        refresh_token: data.session.refresh_token,
-      });
+      try {
+        await supabase.auth.setSession({
+          access_token: data.session.access_token,
+          refresh_token: data.session.refresh_token,
+        });
+      } catch {
+        // Cookie-based session couldn't be set (e.g. HTTP localhost).
+      }
       localStorage.setItem("foodrush_auth_id", data.user.id);
     }
 

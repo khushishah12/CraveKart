@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 
 import { useIsRestaurantOwner } from "@/lib/auth";
+import { ownerFetch } from "@/lib/owner-fetch";
 import dynamic from "next/dynamic";
 
 const UserMenu = dynamic(
@@ -62,7 +63,7 @@ export default function KitchenPage() {
   const [updatingId, setUpdatingId] = useState<number | null>(null);
 
   const fetchOrders = useCallback(() => {
-    fetch("/api/owner/kitchen")
+    ownerFetch("/api/owner/kitchen")
       .then((r) => r.json())
       .then((d) => setOrders(d.orders ?? []))
       .catch(() => null)
@@ -71,7 +72,7 @@ export default function KitchenPage() {
 
   useEffect(() => {
     let active = true;
-    fetch("/api/owner/kitchen")
+    ownerFetch("/api/owner/kitchen")
       .then((r) => r.json())
       .then((d) => active && setOrders(d.orders ?? []))
       .catch(() => null)
@@ -89,7 +90,7 @@ export default function KitchenPage() {
   async function updateStatus(id: number, newStatus: string) {
     setUpdatingId(id);
     try {
-      const r = await fetch("/api/owner/kitchen", {
+      const r = await ownerFetch("/api/owner/kitchen", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ orderId: id, status: newStatus }),
@@ -109,7 +110,7 @@ export default function KitchenPage() {
   const nextStatus: Record<string, string> = {
     pending: "preparing",
     preparing: "ready",
-    ready: "out_for_delivery",
+    ready: "on_the_way",
   };
 
   const nextLabel: Record<string, string> = {

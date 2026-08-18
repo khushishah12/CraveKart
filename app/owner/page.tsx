@@ -8,7 +8,6 @@ import {
   CookingPot,
   Megaphone,
   Pizza,
-  Star,
   Store,
   TrendingUp,
   ShoppingCart,
@@ -22,6 +21,7 @@ import { StatCard } from "@/components/ui/StatCard";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Badge, statusTone, STATUS_LABEL } from "@/components/ui/Badge";
 import { useCurrentUser, useIsRestaurantOwner } from "@/lib/auth";
+import { ownerFetch } from "@/lib/owner-fetch";
 
 const UserMenu = dynamic(
   () => import("@/components/ui/UserMenu").then((m) => m.UserMenu),
@@ -29,10 +29,9 @@ const UserMenu = dynamic(
 );
 
 type AnalyticsData = {
-  totalOrders: number;
+  total_orders: number;
   revenue: number;
-  pendingOrders: number;
-  averageRating: number;
+  avg_rating: number;
 };
 
 type RecentOrder = {
@@ -63,8 +62,8 @@ export default function OwnerDashboardPage() {
     if (!isOwner) return;
     let active = true;
     Promise.all([
-      fetch("/api/owner/analytics").then((r) => r.json()),
-      fetch("/api/owner/orders").then((r) => r.json()),
+      ownerFetch("/api/owner/analytics").then((r) => r.json()),
+      ownerFetch("/api/owner/orders").then((r) => r.json()),
     ])
       .then(([a, o]) => {
         if (!active) return;
@@ -135,7 +134,7 @@ export default function OwnerDashboardPage() {
                 <StatCard
                   icon={ShoppingCart}
                   label="Total Orders"
-                  value={analytics?.totalOrders ?? 0}
+                  value={analytics?.total_orders ?? 0}
                   tone="brand"
                 />
                 <StatCard
@@ -146,15 +145,9 @@ export default function OwnerDashboardPage() {
                 />
                 <StatCard
                   icon={Clock}
-                  label="Pending Orders"
-                  value={analytics?.pendingOrders ?? 0}
+                  label="Avg Rating"
+                  value={analytics?.avg_rating?.toFixed(1) ?? "—"}
                   tone="warning"
-                />
-                <StatCard
-                  icon={Star}
-                  label="Average Rating"
-                  value={analytics?.averageRating?.toFixed(1) ?? "—"}
-                  tone="neutral"
                 />
               </section>
 

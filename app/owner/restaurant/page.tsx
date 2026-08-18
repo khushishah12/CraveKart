@@ -13,6 +13,7 @@ import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 
 import { useIsRestaurantOwner } from "@/lib/auth";
+import { ownerFetch } from "@/lib/owner-fetch";
 
 const UserMenu = dynamic(
   () => import("@/components/ui/UserMenu").then((m) => m.UserMenu),
@@ -53,12 +54,13 @@ export default function OwnerRestaurantPage() {
   useEffect(() => {
     if (!isOwner) return;
     let active = true;
-    fetch("/api/owner/restaurant")
+    ownerFetch("/api/owner/restaurant")
       .then((r) => r.json())
       .then((d) => {
         if (!active) return;
-        if (d) {
-          setForm((prev) => ({ ...prev, ...d }));
+        const rest = d.restaurant ?? d;
+        if (rest) {
+          setForm((prev) => ({ ...prev, ...rest }));
         }
       })
       .catch(() => {})
@@ -79,7 +81,7 @@ export default function OwnerRestaurantPage() {
     setSaving(true);
     setNotice(null);
     try {
-      const r = await fetch("/api/owner/restaurant", {
+      const r = await ownerFetch("/api/owner/restaurant", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

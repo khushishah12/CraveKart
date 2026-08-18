@@ -20,6 +20,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { Badge, statusTone, STATUS_LABEL } from "@/components/ui/Badge";
 
 import { useIsRestaurantOwner } from "@/lib/auth";
+import { ownerFetch } from "@/lib/owner-fetch";
 
 const UserMenu = dynamic(
   () => import("@/components/ui/UserMenu").then((m) => m.UserMenu),
@@ -72,10 +73,18 @@ export default function OwnerOrdersPage() {
   useEffect(() => {
     if (!isOwner) return;
     let active = true;
-    fetch("/api/owner/orders")
-      .then((r) => r.json())
-      .then((d) => active && setOrders(d.orders ?? []))
-      .catch(() => {})
+    ownerFetch("/api/owner/orders")
+      .then(async (r) => {
+        const d = await r.json();
+        if (!r.ok) {
+          if (active) setNotice({ ok: false, message: d.error ?? `Error ${r.status}` });
+          return;
+        }
+        if (active) setOrders(d.orders ?? []);
+      })
+      .catch(() => {
+        if (active) setNotice({ ok: false, message: "Network error loading orders." });
+      })
       .finally(() => active && setLoading(false));
     return () => {
       active = false;
@@ -86,7 +95,7 @@ export default function OwnerOrdersPage() {
     setUpdatingId(id);
     setNotice(null);
     try {
-      const r = await fetch(`/api/owner/orders/${id}`, {
+      const r = await ownerFetch(`/api/owner/orders/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),

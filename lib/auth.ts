@@ -25,6 +25,14 @@ function invalidateProfileCache() {
 }
 
 function subscribe(cb: () => void) {
+  // Invalidate the cache on every mount so that profile data written to
+  // localStorage while this component was unmounted (e.g. during login)
+  // is picked up on the fresh mount.
+  // NOTE: React calls getSnapshot() *before* subscribe() on initial mount,
+  // so the snapshot may have returned a stale cached value.  Calling cb()
+  // here tells React to re-read the snapshot now that the cache is clear.
+  invalidateProfileCache();
+  cb();
   const onAuth = () => {
     invalidateProfileCache();
     cb();

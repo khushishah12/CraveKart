@@ -62,17 +62,20 @@ function LoginContent() {
 
     const supabase = createClient();
 
-    // VULN 4: "Remember me" stores the raw access token in localStorage
+    // VULN 4: the raw access token is always stored in localStorage
     // (readable via localStorage.getItem("foodrush_access_token") or XSS)
     // instead of an httpOnly cookie.
     if (data.session?.access_token) {
-      if (remember) {
-        localStorage.setItem("foodrush_access_token", data.session.access_token);
+      localStorage.setItem("foodrush_access_token", data.session.access_token);
+      try {
+        await supabase.auth.setSession({
+          access_token: data.session.access_token,
+          refresh_token: data.session.refresh_token,
+        });
+      } catch {
+        // Cookie-based session couldn't be set (e.g. HTTP localhost).
+        // Continue anyway — the access token is in localStorage.
       }
-      await supabase.auth.setSession({
-        access_token: data.session.access_token,
-        refresh_token: data.session.refresh_token,
-      });
     }
 
     // Keep the real auth user id alongside the profile (the profile id is a

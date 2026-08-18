@@ -21,8 +21,8 @@ type FoodCategory = {
   sort_order: number;
 };
 
-export async function GET() {
-  const auth = await requireOwner();
+export async function GET(_request: NextRequest) {
+  const auth = await requireOwner(_request);
   if (!auth.ok) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
@@ -59,7 +59,7 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const auth = await requireOwner();
+  const auth = await requireOwner(request);
   if (!auth.ok) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
   }

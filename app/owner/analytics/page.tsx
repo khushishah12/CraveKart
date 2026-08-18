@@ -9,6 +9,7 @@ import { StatCard } from "@/components/ui/StatCard";
 import { Skeleton } from "@/components/ui/Skeleton";
 
 import { useIsRestaurantOwner } from "@/lib/auth";
+import { ownerFetch } from "@/lib/owner-fetch";
 import dynamic from "next/dynamic";
 
 const UserMenu = dynamic(
@@ -58,7 +59,7 @@ export default function AnalyticsPage() {
 
   useEffect(() => {
     let active = true;
-    fetch("/api/owner/analytics")
+    ownerFetch("/api/owner/analytics")
       .then((r) => r.json())
       .then((d) => active && setData(d))
       .catch(() => null)

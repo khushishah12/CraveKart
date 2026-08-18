@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { requireOwner } from "@/lib/owner-auth";
 import { createClient } from "@/lib/supabase/server";
 
-export async function GET() {
-  const auth = await requireOwner();
+export async function GET(_request: NextRequest) {
+  const auth = await requireOwner(_request);
   if (!auth.ok) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
@@ -32,15 +32,12 @@ export async function GET() {
     const orderRows = orders ?? [];
 
     let totalRevenue = 0;
-    let pendingOrders = 0;
     const ordersByStatus: Record<string, number> = {};
     const itemCounts: Record<string, number> = {};
     const dailyRevenueMap: Record<string, number> = {};
 
     for (const order of orderRows) {
       totalRevenue += Number(order.total) || 0;
-
-      if (order.status === "pending") pendingOrders += 1;
 
       ordersByStatus[order.status] = (ordersByStatus[order.status] || 0) + 1;
 
@@ -58,12 +55,12 @@ export async function GET() {
     }
 
     const topItems = Object.entries(itemCounts)
-      .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => b.count - a.count)
+      .map(([name, order_count]) => ({ name, order_count }))
+      .sort((a, b) => b.order_count - a.order_count)
       .slice(0, 10);
 
-    const dailyRevenue = Object.entries(dailyRevenueMap)
-      .map(([date, revenue]) => ({ date, revenue }))
+    const revenue_last_7_days = Object.entries(dailyRevenueMap)
+      .map(([date, amount]) => ({ date, amount }))
       .sort((a, b) => b.date.localeCompare(a.date))
       .slice(0, 7);
 
@@ -103,15 +100,14 @@ export async function GET() {
     }
 
     return NextResponse.json({
-      totalOrders: totalOrders ?? 0,
-      totalRevenue,
-      pendingOrders,
-      averageRating,
-      totalMenuItems,
-      totalReviews,
-      ordersByStatus,
-      dailyRevenue,
-      topItems,
+      total_orders: totalOrders ?? 0,
+      revenue: totalRevenue,
+      avg_rating: averageRating,
+      total_reviews: totalReviews,
+      total_menu_items: totalMenuItems,
+      orders_by_status: Object.entries(ordersByStatus).map(([status, count]) => ({ status, count })),
+      revenue_last_7_days,
+      top_items: topItems,
     });
   } catch {
     return NextResponse.json({ error: "Internal server error." }, { status: 500 });

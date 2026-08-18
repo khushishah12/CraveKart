@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 
 import { useIsRestaurantOwner } from "@/lib/auth";
+import { ownerFetch } from "@/lib/owner-fetch";
 import dynamic from "next/dynamic";
 
 const UserMenu = dynamic(
@@ -56,7 +57,7 @@ export default function ReviewsPage() {
 
   useEffect(() => {
     let active = true;
-    fetch("/api/owner/reviews")
+    ownerFetch("/api/owner/reviews")
       .then((r) => r.json())
       .then((d) => active && setReviews(d.reviews ?? []))
       .catch(() => null)
@@ -70,7 +71,7 @@ export default function ReviewsPage() {
     if (!replyText.trim()) return;
     setSubmittingId(reviewId);
     try {
-      const r = await fetch(`/api/owner/reviews/${reviewId}/reply`, {
+      const r = await ownerFetch(`/api/owner/reviews/${reviewId}/reply`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: replyText.trim() }),

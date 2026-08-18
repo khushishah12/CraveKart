@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MapPin, Phone, ShieldCheck, UserRound } from "lucide-react";
+import { MapPin, Phone, ShieldCheck, Store, UserRound } from "lucide-react";
 
 import { AUTH_EVENT, type UserProfile } from "@/lib/cart";
 import { Button } from "@/components/ui/Button";
@@ -11,7 +11,7 @@ import { PageShell } from "@/components/ui/PageShell";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge } from "@/components/ui/Badge";
 
-import { useCurrentUser, useIsAdmin } from "@/lib/auth";
+import { useCurrentUser, useIsAdmin, useIsRestaurantOwner } from "@/lib/auth";
 
 function initials(name: string | null | undefined): string {
   if (!name) return "U";
@@ -21,13 +21,16 @@ function initials(name: string | null | undefined): string {
 
 function EditProfileForm({
   profile,
+  isOwner,
 }: {
   profile: Pick<UserProfile, "name" | "phone" | "delivery_address">;
+  isOwner: boolean;
 }) {
   const [form, setForm] = useState({
     name: profile.name ?? "",
     phone: profile.phone ?? "",
     address: profile.delivery_address ?? "",
+    restaurantName: "",
   });
   const [saving, setSaving] = useState(false);
   const [result, setResult] = useState<{ ok?: boolean; message: string } | null>(null);
@@ -36,21 +39,29 @@ function EditProfileForm({
     setSaving(true);
     setResult(null);
     try {
+      const token = localStorage.getItem("foodrush_access_token");
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      const body: Record<string, string> = {
+        name: form.name,
+        phone: form.phone,
+        delivery_address: form.address,
+      };
+      if (isOwner && form.restaurantName.trim()) {
+        body.restaurant_name = form.restaurantName.trim();
+      }
+
       const r = await fetch("/api/profile/update", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: form.name,
-          phone: form.phone,
-          delivery_address: form.address,
-        }),
+        headers,
+        body: JSON.stringify(body),
       });
       const d = await r.json();
       if (!r.ok) {
         setResult({ message: d.error ?? "Failed to update profile." });
         return;
       }
-      // Keep the local profile snapshot in sync with the server.
       if (d.profile) {
         const existing = JSON.parse(localStorage.getItem("foodrush_user") ?? "null") ?? {};
         localStorage.setItem("foodrush_user", JSON.stringify({ ...existing, ...d.profile }));
@@ -60,8 +71,11 @@ function EditProfileForm({
         name: d.profile?.name ?? f.name,
         phone: d.profile?.phone ?? f.phone,
         address: d.profile?.delivery_address ?? f.address,
+        restaurantName: d.restaurant?.name ?? f.restaurantName,
       }));
-      setResult({ ok: true, message: "Profile updated." });
+      const msgs = ["Profile updated."];
+      if (d.restaurant) msgs.push(`Restaurant "${d.restaurant.name}" linked.`);
+      setResult({ ok: true, message: msgs.join(" ") });
     } catch {
       setResult({ message: "Network error." });
     } finally {
@@ -104,6 +118,21 @@ function EditProfileForm({
             icon={<MapPin className="size-[18px]" />}
           />
         </Field>
+        {isOwner && (
+          <Field
+            label="Restaurant name"
+            htmlFor="edit-restaurant"
+            hint="Your restaurant will appear in the owner dashboard."
+          >
+            <Input
+              id="edit-restaurant"
+              value={form.restaurantName}
+              onChange={(e) => setForm((f) => ({ ...f, restaurantName: e.target.value }))}
+              placeholder="e.g. Spice Kitchen"
+              icon={<Store className="size-[18px]" />}
+            />
+          </Field>
+        )}
       </div>
       <Button className="mt-5 w-full" size="lg" loading={saving} onClick={saveProfile}>
         Save profile
@@ -127,6 +156,7 @@ function EditProfileForm({
 export default function ProfilePage() {
   const profile = useCurrentUser();
   const isAdmin = useIsAdmin();
+  const isOwner = useIsRestaurantOwner();
 
   const [current, setCurrent] = useState("");
   const [email, setEmail] = useState("");
@@ -173,7 +203,7 @@ export default function ProfilePage() {
             </p>
             <p className="truncate text-sm text-ink-500">{profile?.email ?? "—"}</p>
           </div>
-          <Badge tone={isAdmin ? "brand" : "neutral"} dot>
+          <Badge tone={isAdmin ? "brand" : isOwner ? "warning" : "neutral"} dot>
             {profile?.role ?? "guest"}
           </Badge>
         </div>
@@ -198,6 +228,7 @@ export default function ProfilePage() {
           phone: profile?.phone ?? null,
           delivery_address: profile?.delivery_address ?? null,
         }}
+        isOwner={isOwner}
       />
 
       <section className="card card-pad mt-5">

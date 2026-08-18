@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export async function GET(_request: NextRequest) {
   try {
-    const auth = await requireOwner();
+    const auth = await requireOwner(_request);
     if (!auth.ok) {
       return NextResponse.json({ error: auth.error }, { status: auth.status });
     }

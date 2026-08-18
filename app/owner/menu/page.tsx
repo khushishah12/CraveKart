@@ -24,6 +24,7 @@ import { Input } from "@/components/ui/Input";
 import { EmptyState } from "@/components/ui/EmptyState";
 
 import { useIsRestaurantOwner } from "@/lib/auth";
+import { ownerFetch } from "@/lib/owner-fetch";
 
 const UserMenu = dynamic(
   () => import("@/components/ui/UserMenu").then((m) => m.UserMenu),
@@ -86,7 +87,7 @@ export default function OwnerMenuPage() {
   useEffect(() => {
     if (!isOwner) return;
     let active = true;
-    fetch("/api/owner/menu")
+    ownerFetch("/api/owner/menu")
       .then((r) => r.json())
       .then((d: MenuResponse) => {
         if (!active) return;
@@ -128,7 +129,7 @@ export default function OwnerMenuPage() {
     setSavingId(id ?? "create");
     try {
       const isEdit = id !== null;
-      const r = await fetch(isEdit ? `/api/owner/menu/${id}` : "/api/owner/menu", {
+      const r = await ownerFetch(isEdit ? `/api/owner/menu/${id}` : "/api/owner/menu", {
         method: isEdit ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -170,7 +171,7 @@ export default function OwnerMenuPage() {
     if (!window.confirm("Delete this item? This cannot be undone.")) return;
     setDeletingId(id);
     try {
-      const r = await fetch(`/api/owner/menu/${id}`, { method: "DELETE" });
+      const r = await ownerFetch(`/api/owner/menu/${id}`, { method: "DELETE" });
       if (r.ok) {
         setItems((prev) => prev.filter((x) => x.id !== id));
         setNotice({ ok: true, message: "Item deleted." });
@@ -188,7 +189,7 @@ export default function OwnerMenuPage() {
   async function toggleAvailability(id: string, current: boolean) {
     setTogglingId(id);
     try {
-      const r = await fetch(`/api/owner/menu/${id}/availability`, {
+      const r = await ownerFetch(`/api/owner/menu/${id}/availability`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ available: !current }),

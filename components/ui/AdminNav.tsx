@@ -2,11 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Receipt, UserRound } from "lucide-react";
+import { LayoutDashboard, UserRound } from "lucide-react";
 
 const TABS = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/orders", label: "Orders", icon: Receipt },
   { href: "/profile", label: "Profile", icon: UserRound },
 ];
 
